@@ -1,4 +1,4 @@
-const CACHE_NAME="alatipha-music-v2";
+const CACHE_NAME="alatipha-music-v3";
 
 const ASSETS=[
 "./",
@@ -9,8 +9,6 @@ const ASSETS=[
 "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 ];
 
-
-/* INSTALL */
 self.addEventListener(
 "install",
 e=>{
@@ -21,8 +19,7 @@ caches.open(CACHE_NAME)
 }
 );
 
-
-/* ADD THIS HERE */
+/* ADD THIS NEW BLOCK */
 self.addEventListener(
 "activate",
 event=>{
@@ -32,8 +29,6 @@ self.clients.claim()
 }
 );
 
-
-/* FETCH */
 self.addEventListener(
 "fetch",
 e=>{
