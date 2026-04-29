@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-  <title>AlatiphA Music</title>
+<title>AlatiphA Music</title>
 
-  <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<!-- Android -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#956433">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- iPhone -->
+<meta name="apple-mobile-web-app-capable"
+content="yes">
+
+<meta name="apple-mobile-web-app-status-bar-style"
+content="black-translucent">
+
 
   <link rel="preload"
         as="image"
@@ -1646,7 +1659,7 @@ document.getElementById("title").textContent =
 songs[currentIndex].title;
 
 cover.src =
-songs[currentIndex].cover;
+songs[currentIndex].cover || COVER;
 
 highlight();
 saveState();
@@ -1833,5 +1846,32 @@ searchInput.value
 }
 );
 
+  /* Register service worker */
+if("serviceWorker" in navigator){
+window.addEventListener(
+"load",
+function(){
+
+navigator.serviceWorker.register("./sw.js")
+.then(function(reg){
+console.log(
+"Service Worker registered",
+reg.scope
+);
+})
+.catch(function(err){
+console.error(
+"SW registration failed",
+err
+);
+});
+
+}
+);
+}
+
 })();
 </script>
+
+</body>
+</html>
