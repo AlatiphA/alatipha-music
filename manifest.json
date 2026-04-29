@@ -1,15 +1,13 @@
 {
 "name":"AlatiphA Music",
 "short_name":"AlatiphA",
-"id":"/alatipha-music/",
-"start_url":"/alatipha-music/",
-"scope":"/alatipha-music/",
+"start_url":"./",
+"scope":"./",
 "display":"standalone",
 "background_color":"#0a0f1c",
 "theme_color":"#956433",
 "orientation":"portrait",
 "description":"AlatiphA Music Progressive Web App",
-"categories":["music","entertainment"],
 "icons":[
 {
 "src":"icon-192.png",
