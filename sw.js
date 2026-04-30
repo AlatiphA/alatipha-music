@@ -1,4 +1,4 @@
-const CACHE_NAME="alatipha-music-v3";
+const CACHE_NAME="alatipha-music-v4";
 
 const ASSETS=[
 "./",
