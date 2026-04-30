@@ -306,24 +306,6 @@ Favorites
     width:max-content;
 }
 
-  .song-title.marquee{
-   animation:ticker 12s linear infinite;
-}
-
-  .song-title::after{
-   content:attr(data-title);
-padding-left:60px; /* gap before repeat */
-}
-
-@keyframes ticker{
-0%{
-transform:translateX(0);
-}
-100%{
-transform:translateX(-50%);
-}
-}
-
   .song-right{
    display:flex;
    align-items:center;
@@ -444,14 +426,32 @@ box-shadow:
     text-align: center;
   }
 
-  #title {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  #title{
+  display:block;
+  overflow:hidden;
+  white-space:nowrap;
+  position:relative;
+}
+
+#title span{
+  display:inline-block;
+  white-space:nowrap;
+}
+
+/* animation */
+#title.marquee span{
+  animation:playerTicker linear infinite;
+}
+
+#title.marquee span::after{
+  content:attr(data-title);
+  padding-left:60px;
+}
+
+@keyframes playerTicker{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
 
   #time {
     font-size: 13px;
@@ -663,6 +663,8 @@ box-shadow:
 /* title */
 .player.mini #title {
   font-size: 13px;
+  width: 100%;
+  overflow: hidden;
 }
 
 /* collapse button stays visible */
@@ -848,6 +850,8 @@ collapseBtn.addEventListener("click", function(e){
    ? '<i class="fas fa-chevron-up"></i>'
    : '<i class="fas fa-chevron-down"></i>';
 
+setTimeout(updateNowPlayingMarquee, 50);
+
 });
 
   function getCurrentPlaylist(){
@@ -910,7 +914,6 @@ return true;
 });
 
 }
-
 
 function renderList(filter=""){
 
@@ -1029,31 +1032,6 @@ searchInput.value
 
 list.appendChild(div);
 
-const movingTitle =
-div.querySelector(".song-title");
-
-requestAnimationFrame(function(){
-
-if(
-movingTitle.scrollWidth >
-movingTitle.parentElement.clientWidth
-){
-
-const distance =
-movingTitle.scrollWidth;
-
-const duration =
-Math.max(8, distance / 18);
-
-movingTitle.style.animationDuration =
-duration + "s";
-
-movingTitle.classList.add("marquee");
-
-}
-
-});
-
 }
 
 highlight();
@@ -1101,8 +1079,14 @@ if (audio.src !== songs[currentIndex].src) {
   audio.src = songs[currentIndex].src;
 }
 
-document.getElementById("title").textContent=
-songs[currentIndex].title;
+const titleEl = document.getElementById("title");
+
+titleEl.innerHTML =
+`<span data-title="${songs[currentIndex].title}">
+${songs[currentIndex].title}
+</span>`;
+
+updateNowPlayingMarquee();
 
 /* swap art without touching animation */
 cover.src = songs[currentIndex].cover || COVER;
@@ -1583,6 +1567,37 @@ function moveDrag(y) {
   player.style.transform = `translateY(${delta}px)`;
 }
 
+function updateNowPlayingMarquee(){
+
+const titleEl = document.getElementById("title");
+const span = titleEl.querySelector("span");
+
+if(!span) return;
+
+/* reset first */
+titleEl.classList.remove("marquee");
+span.style.animationDuration = "";
+
+/* wait for layout to settle */
+requestAnimationFrame(()=>{
+requestAnimationFrame(()=>{
+
+if(span.scrollWidth > titleEl.clientWidth){
+
+const distance = span.scrollWidth;
+const duration = Math.max(8, distance / 18);
+
+span.style.animationDuration = duration + "s";
+
+titleEl.classList.add("marquee");
+
+}
+
+});
+});
+
+}
+
 function endDrag() {
   if (!isDragging) return;
 
@@ -1614,6 +1629,8 @@ function endDrag() {
   setTimeout(function () {
     hasMoved = false;
   }, 120);
+  
+  setTimeout(updateNowPlayingMarquee, 50);
 }
 
  audio.addEventListener("ended", function(){
@@ -1655,8 +1672,31 @@ audio.src = nextBufferAudio.src;
 
 currentIndex = nextSongIndex;
 
-document.getElementById("title").textContent =
-songs[currentIndex].title;
+const titleEl = document.getElementById("title");
+
+titleEl.innerHTML =
+`<span data-title="${songs[currentIndex].title}">
+${songs[currentIndex].title}
+</span>`;
+
+requestAnimationFrame(function(){
+
+const span = titleEl.querySelector("span");
+
+if(span.scrollWidth > titleEl.clientWidth){
+
+const distance = span.scrollWidth;
+const duration = Math.max(8, distance / 18);
+
+span.style.animationDuration = duration + "s";
+
+titleEl.classList.add("marquee");
+
+}else{
+titleEl.classList.remove("marquee");
+}
+
+});
 
 cover.src =
 songs[currentIndex].cover || COVER;
@@ -1725,7 +1765,6 @@ highlight();
 saveState();
 
 });
-
 
   menuBtn.onclick = (e) => {
     e.stopImmediatePropagation();
