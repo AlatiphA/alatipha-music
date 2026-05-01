@@ -1834,6 +1834,7 @@ updateRepeatButton();
 updateClearButton();
 
 checkForUpdate();
+  setTimeout(checkForUpdate, 2000);
 setInterval(checkForUpdate, 60000);
 
 if ("serviceWorker" in navigator) {
