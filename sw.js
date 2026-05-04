@@ -39,7 +39,7 @@ self.addEventListener("activate", (event) => {
 
       await self.clients.claim();
 
-      // 🔥 FORCE ALL OPEN TABS / PWA TO RELOAD
+      /* FORCE ALL OPEN TABS TO RELOAD */
       const clientsList = await self.clients.matchAll();
       clientsList.forEach(client => {
         client.postMessage({ type: "RELOAD" });
@@ -51,24 +51,16 @@ self.addEventListener("activate", (event) => {
 
 /* FETCH HANDLING */
 self.addEventListener("fetch", (event) => {
+
   const request = event.request;
 
-  /* 1. MP3 FILES (offline music support) */
+  /* 1. MP3 FILES (🔥 FIXED: CACHE FIRST) */
   if (request.url.includes(".mp3")) {
-    event.respondWith(
-      caches.open(SONG_CACHE).then((cache) => {
-        return fetch(request)
-          .then((response) => {
-            cache.put(request, response.clone());
-            return response;
-          })
-          .catch(() => cache.match(request));
-      })
-    );
+    event.respondWith(cacheAudioFirst(request));
     return;
   }
 
-  /* 2. HTML (ALWAYS FRESH) */
+  /* 2. HTML (NETWORK FIRST) */
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -83,7 +75,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  /* 3. OTHER ASSETS (stale-while-revalidate) */
+  /* 3. OTHER ASSETS (STALE-WHILE-REVALIDATE) */
   event.respondWith(
     caches.match(request).then((cached) => {
 
@@ -103,7 +95,34 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-/* OPTIONAL: allow manual skip waiting */
+/* 🔥 AUDIO CACHE FUNCTION (NEW CORE FIX) */
+async function cacheAudioFirst(request) {
+
+  const cache = await caches.open(SONG_CACHE);
+
+  /* RETURN CACHED VERSION INSTANTLY */
+  const cached = await cache.match(request);
+  if (cached) return cached;
+
+  try {
+
+    const response = await fetch(request);
+
+    /* STORE FOR OFFLINE */
+    cache.put(request, response.clone());
+
+    return response;
+
+  } catch (err) {
+
+    return new Response("Audio not available offline", {
+      status: 404
+    });
+
+  }
+}
+
+/* OPTIONAL: MANUAL SKIP WAITING */
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
