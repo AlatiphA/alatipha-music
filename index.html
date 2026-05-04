@@ -723,102 +723,157 @@ function showUpdatePrompt() {
 "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi0_lQRpa_X50T-4zAAYHZUqeUjqDb-JkeOgmg31u_2Apnsut3Nfe_zrvW1rqOq7aKxEjzgxcv2ndc7CC-Jo_9O0pbmva3vn8N0xqiscfAah_frGjHgAsiSpwJSqnV976_5FtENJDnyuIcSEpW0T-LBQctvRczjy54IvEGCb86MXy2_CVCZphGwj2NjV6uc/s500/AlatiphA_Music_Animation.png";
 
 const songs = [
-        { title: "Awake, Ghana Youth (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Awake_%20Ghana%20Youth%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3" },
-               
-       { title: "Bare Teeth of Hypocrisy - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Bare%20Teeth%20of%20Hypocrisy%20-%20AlatiphA%20AI%28MP3_160K%29_1.mp3" }, 
+{ 
+   title:"Awake Ghana Youth",
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Awake%2C%20Ghana%20Youth%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["RnB"]
+},
 
-        { title: "Chalk Dust Promises (Remix) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20%28Remix%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
+{ 
+   title: "Bare Teeth of Hypocrisy (Rap) - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Bare%20Teeth%20of%20Hypocrisy%20-%20AlatiphA%20AI%28MP3_160K%29_1.mp3", 
+   tags: ["rap"]
+}, 
 
-        { title: "Geography of Greed - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Geography%20of%20greed%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
+{ 
+   title: "Chalk Dust Promises (Remix) - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20%28Remix%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3",
+    tags: ["rap", "remix"]
+},
 
-        { title: "LGBTQ not Priority - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/LGBTQ%20%20Not%20a%20Priority%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Neutral no More - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Neutral%20No%20More%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Preach Reset - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28R%26B%29%20-%20AlatiphA%20AI.mp3" },  
-
-        { title: "Scorecard Flow - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Scorecard%20Flow%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Stand or fall - AlatiphA ", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Stand%20or%20fall%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Agyapadie Promax (State Capture) (R&B) - AlatiphA ", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/State%20Capture%20%28Agyapadie%20Promax%29%20%20%28R%26B%29%20-%20AlatiphA%20AI.mp3" },
-
-        { title: "Still Standing - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Still%20Standing%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Too Big for Their Games - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Too%20Big%20for%20Their%20Games%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Weatherproof Lies (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28Rap%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Wo de ya ka - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Wo%20de%20ya%20ka%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-         { title: "Yawa Season (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3" },
-
-       { title: "ORAL vs OCAL (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3" },
-       
-        { title: "Chalk Dust Promises (Remix) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20%28Remix%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%20AI.mp3" },
-
-        { title: "Weatherproof Lies (R&B) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28R%26B%29%20-%20AlatiphA%20AI.mp3" },
-
-        { title: "Agyapadie Promax (State Capture) AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/State%20Capture%20%28Agyapadie%20Promax%29%20AlatiphA%20AI.mp3" },
-
-        { title: "Chalk Dust Promises - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Rap Lyric Tribute – Shield and Pillar - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Rap%20Lyric%20Tribute%20%E2%80%93%20_Shield%20and%20Pillar_%28From%20Black%20Maria%20to%20their%20Commander%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
-
-        { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%20AI.mp3" },
+        { title: "Geography of Greed - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Geography%20of%20greed%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+}, 
         
-     { title: "No Be Pawn (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3" },
-        
-       { title: "No Be Pawn - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/No%20Be%20Pawn%20-%20AlatiphA%28MP3_160K%29.mp3" },
-       
-       { title: "Agyapadie Promax (State Capture) (R&B) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28R_B%29%20-%20AlatiphA%28MP3_160K%29.mp3" },
+        { title: "LGBTQ not Priority - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/LGBTQ%20%20Not%20a%20Priority%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
 
-       { title: "Agyapadie Promax (State Capture) (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3" },       
+        { title: "Neutral no More - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Neutral%20No%20More%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Preach Reset - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["RnB"]
+},  
+
+        { title: "Scorecard Flow - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Scorecard%20Flow%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Stand or fall - AlatiphA ", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Stand%20or%20fall%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Agyapadie Promax (State Capture) (R&B) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28R_B%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["RnB"]
+},
+
+        { title: "Still Standing - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Still%20Standing%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Too Big for Their Games - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Too%20Big%20for%20Their%20Games%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Weatherproof Lies (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28Rap%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Wo de ya ka - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Wo%20de%20ya%20ka%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap", "Afrobeat"]
+},
+
+         { title: "Yawa Season (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "remix"]
+},
+
+       { title: "ORAL vs OCAL (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "remix"]
+},
+
+        { title: "Weatherproof Lies (R&B) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["RnB"]
+},
+
+        { title: "Chalk Dust Promises - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Rap Lyric Tribute – Shield and Pillar - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Rap%20Lyric%20Tribute%20%E2%80%93%20_Shield%20and%20Pillar_%28From%20Black%20Maria%20to%20their%20Commander%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+        { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["rap"]
+},
+        
+     { title: "No Be Pawn (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "remix"]
+},
+ 
+        { title: "Agyapadie Promax (State Capture) (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+        
+        { title: "Awake, Ghana Youth (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Awake_%20Ghana%20Youth%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
   
-        { title: "Shee mungani - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Shee%20mungani%20-%20AlatiphA%20AI%28MP3_160K%29.mp3" },
+        { title: "Shee mungani - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Shee%20mungani%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap", "AfroBeat"]
+},
        
-           { title: "ORAL vs OCAL (Afro-beat) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20-%20AlatiphA%28MP3_160K%29.mp3" },
+           { title: "ORAL vs OCAL (Afro-beat) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "AfroBeat"]
+},
            
-         { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3" },
+         { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
 
-        { title: "Yawa Season - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3" },
+        { title: "Yawa Season - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+}, 
 
-       { title: "Awake, Ghana Youth (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Awake%2C%20Ghana%20Youth%20-%20AlatiphA%20AI.mp3" },
+       { title: "No Be Pawn - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/No%20Be%20Pawn%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "newrelease"]
+}, 
 
-       { title: "Wins Only (Reset On Course) (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Wins%20Only%20%28Reset%20On%20Course%29%20%28Rap%29%20-%20AlatiphA.mp3" },
+{ title: "Wins Only (Reset On Course) (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Wins%20Only%20%28Reset%20On%20Course%29%20%28Rap%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "newrelease"]
+},
 
-       { title: "Galamsey Tears & Church Power (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Galamsey%20Tears%20%26%20Church%20Power%20%28Rap%29%20-%20AlatiphA.mp3" },
+       { title: "Galamsey Tears & Church Power (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Galamsey%20Tears%20%26%20Church%20Power%20%28Rap%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "newrelease"]
+},
 
-       { title: "Aku Deception (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Aku%20Deception%20%28Rap%29%20-%20AlatiphA.mp3" }
+       { title: "Aku Deception (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Aku%20Deception%20%28Rap%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "newrelease"]
+}
   ];
   
   /* ADD SONGS TO PLAYLIST */
-  const playlists={
-all:songs.map((_,i)=>i),
+  function getPlaylistByTag(tag){
 
-newrelease:[
-24,30,31,32,33,34
-],
+  const normalizedTag = (tag || "").toLowerCase();
 
-rap:[
-0,1,2,3,4,5,7,8,10,11,12,13,14,15,17,19,20,21,22,23,26,27,28,29,30,31,32,33,34
-],
+  return songs
+    .map((song, index) => ({ song, index }))
+    .filter(item => {
 
-RnB:[
-6,9,18,25
-],
+      if (normalizedTag === "all") return true;
 
-remix:[
-2,14,15,16,23
-], 
+      if (!item.song.tags) return false;
 
-AfroBeat:[
-24,29
-]
+      return item.song.tags
+        .map(t => t.toLowerCase())
+        .includes(normalizedTag);
 
-};
+    });
+
+}
 
   let activePlaylist="all";
   let showFavoritesOnly = false;
@@ -897,23 +952,15 @@ setTimeout(updateNowPlayingMarquee, 50);
 
   function getCurrentPlaylist(){
 
- if(showFavoritesOnly){
-   return songs.filter((_,i)=>
-      favorites.includes(i)
-   );
- }
-
- let indexes =
-    playlists[activePlaylist] ||
-    playlists.all;
-
- return indexes.map(i => songs[i]);
-}
-
-  function getCurrentPlaylistIndex() {
-    const playlist = getCurrentPlaylist();
-    return playlist.findIndex(song => song.src === songs[currentIndex]?.src);
+  if(showFavoritesOnly){
+    return songs
+      .map((song, index) => ({ song, index }))
+      .filter(item => favorites.includes(item.index));
   }
+
+  return getPlaylistByTag(activePlaylist);
+
+}
 
   function updateRepeatButton() {
     repeatBtn.classList.remove("active");
@@ -931,28 +978,17 @@ setTimeout(updateNowPlayingMarquee, 50);
 
   function getFilteredSongs(filter=""){
 
-return songs
-.map((song,i)=>({song,i}))
-.filter(item=>{
+  const playlist = getCurrentPlaylist();
 
-if(
-!item.song.title.toLowerCase()
-.includes(filter.toLowerCase())
-) return false;
+  return playlist.filter(item => {
 
-if(
-showFavoritesOnly &&
-!favorites.includes(item.i)
-) return false;
+    if(!item.song.title.toLowerCase().includes(filter.toLowerCase())){
+      return false;
+    }
 
-if(
-!showFavoritesOnly &&
-!playlists[activePlaylist].includes(item.i)
-) return false;
+    return true;
 
-return true;
-
-});
+  });
 
 }
 
@@ -983,9 +1019,9 @@ let songIndex=startIndex+row;
 if(songIndex>=filteredSongs.length)
 break;
 
-let item=filteredSongs[songIndex];
-let song=item.song;
-let i=item.i;
+let item = filteredSongs[songIndex];
+let song = item.song;
+let i = item.index;
 
 const div=document.createElement("div");
 
@@ -1045,31 +1081,21 @@ saveState();
 
 };
 
-div
-.querySelector('.heart')
-.onclick=e=>{
+div.querySelector('.heart').onclick = e => {
 
-e.stopPropagation();
+  e.stopPropagation();
 
-if(favorites.includes(i)){
-favorites=
-favorites.filter(
-x=>x!==i
-);
-}else{
-favorites.push(i);
-}
+  if(favorites.includes(i)){
+    favorites = favorites.filter(x => x !== i);
+  } else {
+    favorites.push(i);
+  }
 
-localStorage.setItem(
-'favorites',
-JSON.stringify(favorites)
-);
+  localStorage.setItem('favorites', JSON.stringify(favorites));
 
-renderList(
-searchInput.value
-);
-
+  renderList(searchInput.value);
 };
+
 
 list.appendChild(div);
 
@@ -1090,9 +1116,8 @@ tabFavorites.classList.add("active");
 return;
 }
 
-const activeBtn=document.querySelector(
-`[data-playlist="${activePlaylist}"]`
-);
+const activeBtn = [...document.querySelectorAll("[data-playlist]")]
+  .find(btn => btn.dataset.playlist.toLowerCase() === activePlaylist);
 
 if(activeBtn){
 activeBtn.classList.add("active");
@@ -1128,6 +1153,7 @@ ${songs[currentIndex].title}
 </span>`;
 
 updateNowPlayingMarquee();
+cacheCurrentSong();
 
 /* swap art without touching animation */
 cover.src = songs[currentIndex].cover || COVER;
@@ -1246,64 +1272,47 @@ audio.duration
 
 }
 
-function preloadNextTrack(){
+function preloadNextTrack() {
 
-const playlist=getCurrentPlaylist();
-if(!playlist.length) return;
+const playlist = getCurrentPlaylist();
+if (!playlist.length) return;
 
 let nextPos;
 
-if(shuffle){
-
-nextPos=getNextShuffleIndex(playlist);
-
-}else{
-
-const currentPos=getCurrentPlaylistIndex();
-nextPos=(currentPos+1)%playlist.length;
-
+if (shuffle) {
+  nextPos = getNextShuffleIndex(playlist);
+} else {
+  const currentPos = getCurrentPlaylistIndex();
+  nextPos = (currentPos + 1) % playlist.length;
 }
 
-const nextSong=playlist[nextPos];
+const nextSong = playlist[nextPos];
 
-nextSongIndex=
-songs.findIndex(
-s=>s.src===nextSong.src
+nextSongIndex = songs.findIndex(
+  s => s.src === nextSong.song.src
 );
 
-if(nextSongIndex<0) return;
+if (nextSongIndex < 0) return;
 
-/* already correct song buffered */
-if(
-nextBufferAudio.src===songs[nextSongIndex].src
-){
-return;
-}
+if (nextBufferAudio.src === songs[nextSongIndex].src) return;
 
-nextBufferAudio.pause();
-
-nextBufferAudio.src=
-songs[nextSongIndex].src;
-
+nextBufferAudio.src = songs[nextSongIndex].src;
 nextBufferAudio.load();
 
-/* force warm buffer */
-const p=nextBufferAudio.play();
-
-if(p){
-
-p.then(()=>{
-nextBufferAudio.pause();
-nextBufferAudio.currentTime=0;
-})
-.catch(()=>{});
-
+/* FORCE BUFFER */
+nextBufferAudio.play().then(() => {
+  nextBufferAudio.pause();
+  nextBufferAudio.currentTime = 0;
+}).catch(() => {});
 }
 
-console.log(
-"Buffered:",
-songs[nextSongIndex].title
-);
+function cacheCurrentSong() {
+
+  if (!("caches" in window)) return;
+
+  caches.open("alatipha-songs-v1").then(cache => {
+    cache.add(songs[currentIndex].src).catch(() => {});
+  });
 
 }
 
@@ -1354,13 +1363,9 @@ cover.classList.remove(
 cover.classList.add("playing");
 
 /* warm next track shortly after playback starts */
-setTimeout(
-preloadNextTrack,
-800
-);
+setTimeout(preloadNextTrack, 200);
 
-}).catch(err=>{
-console.warn(err);
+}).catch(err=>{console.warn(err);
 });
 
 }
@@ -1479,55 +1484,104 @@ menuPopup.style.display="none";
     searchInput.focus();
   };
 
-tabFavorites.onclick=()=>{
-showFavoritesOnly=true;
+tabFavorites.onclick = () => {
+  showFavoritesOnly = true;
+  startIndex = 0; // reset scroll
 
-updateActiveTab();
-renderList(searchInput.value);
+  updateActiveTab();
+  renderList(searchInput.value);
 };
 
   playBtn.onclick = () => audio.paused ? playSong() : pauseSong();
 
   function getNextShuffleIndex(playlist) {
-    let newIdx;
-    do {
-      newIdx = Math.floor(Math.random() * playlist.length);
-    } while (playlist.length > 1 && playlist[newIdx].src === songs[currentIndex].src);
-    return newIdx;
-  }
+
+  let newIdx;
+
+  do {
+    newIdx = Math.floor(Math.random() * playlist.length);
+  } while (
+    playlist.length > 1 &&
+    playlist[newIdx].index === currentIndex
+  );
+
+  return newIdx;
+
+}
+  
+  function getCurrentPlaylistIndex(){
+
+  const playlist = getCurrentPlaylist();
+
+  return playlist.findIndex(item => item.index === currentIndex);
+
+}
 
   document.getElementById("next").onclick = () => {
-    const playlist = getCurrentPlaylist();
-    if (playlist.length === 0) return;
 
-    if (shuffle) {
-      let newIdx = getNextShuffleIndex(playlist);
-      currentIndex = songs.findIndex(s => s.src === playlist[newIdx].src);
-    } else {
-      const currentPos = getCurrentPlaylistIndex();
-      const nextPos = (currentPos + 1) % playlist.length;
-      currentIndex = songs.findIndex(s => s.src === playlist[nextPos].src);
-    }
+const playlist = getCurrentPlaylist();
+if (!playlist.length) return;
 
-    loadSong();
-    playSong();
-    highlight();
-    saveState();
-  };
+/* USE PRELOADED TRACK IF AVAILABLE */
+if (nextBufferAudio && nextSongIndex !== null) {
+
+  audio.pause();
+
+  audio.src = nextBufferAudio.src;
+  currentIndex = nextSongIndex;
+
+  loadSong();
+  audio.play();
+
+  highlight();
+  saveState();
+
+  nextPreloaded = false;
+  setTimeout(preloadNextTrack, 200);
+
+  return;
+}
+
+/* FALLBACK */
+
+if (shuffle) {
+  let newIdx = getNextShuffleIndex(playlist);
+  currentIndex = songs.findIndex(
+    s => s.src === playlist[newIdx].song.src
+  );
+} else {
+  const currentPos = getCurrentPlaylistIndex();
+  const nextPos = (currentPos + 1) % playlist.length;
+  currentIndex = songs.findIndex(
+    s => s.src === playlist[nextPos].song.src
+  );
+}
+
+loadSong();
+playSong();
+highlight();
+saveState();
+};
 
   document.getElementById("prev").onclick = () => {
-    const playlist = getCurrentPlaylist();
-    if (playlist.length === 0) return;
 
-    const currentPos = getCurrentPlaylistIndex();
-    const prevPos = (currentPos - 1 + playlist.length) % playlist.length;
-    currentIndex = songs.findIndex(s => s.src === playlist[prevPos].src);
+const playlist = getCurrentPlaylist();
+if (!playlist.length) return;
 
-    loadSong();
-    playSong();
-    highlight();
-    saveState();
-  };
+const currentPos = getCurrentPlaylistIndex();
+const prevPos = (currentPos - 1 + playlist.length) % playlist.length;
+
+currentIndex = songs.findIndex(
+  s => s.src === playlist[prevPos].song.src
+);
+
+loadSong();
+playSong();
+highlight();
+saveState();
+
+setTimeout(preloadNextTrack, 200);
+};
 
   audio.addEventListener("timeupdate", () => {
 
@@ -1828,29 +1882,21 @@ if ("serviceWorker" in navigator) {
 }
 
   renderList();
-loadSong();
-highlight();
-updateRepeatButton();
-updateClearButton();
+  loadSong();
+  highlight();
+  updateRepeatButton();
+  updateClearButton();
 
 checkForUpdate();
-  setTimeout(checkForUpdate, 2000);
+setTimeout(checkForUpdate, 2000);
 setInterval(checkForUpdate, 60000);
 
 if ("serviceWorker" in navigator) {
-
-  navigator.serviceWorker.register("./sw.js");
-
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "RELOAD") {
-      window.location.reload();
-    }
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("./sw.js")
+      .then(reg => console.log("SW registered", reg.scope))
+      .catch(err => console.error("SW failed", err));
   });
-
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    window.location.reload();
-  });
-
 }
 
 // HAPTIC FEEDBACK (VIBRATION)
@@ -1888,17 +1934,16 @@ player.addEventListener("click", function(e){
 /* PLAYLIST TAB CLICK */
 document.querySelectorAll(".tab-btn[data-playlist]").forEach(btn=>{
 
-btn.addEventListener("click",function(){
+  btn.addEventListener("click",function(){
 
-showFavoritesOnly=false;
+    showFavoritesOnly = false;
 
-activePlaylist=this.dataset.playlist;
+    activePlaylist = this.dataset.playlist.toLowerCase(); // 🔥 normalize here
 
-updateActiveTab();
+    updateActiveTab();
+    renderList(searchInput.value);
 
-renderList(searchInput.value);
-
-});
+  });
 
 });
 
@@ -1975,18 +2020,6 @@ err
 
 }
 );
-}
-
-if ("serviceWorker" in navigator) {
-
-  navigator.serviceWorker.register("./sw.js");
-
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "RELOAD") {
-      window.location.reload();
-    }
-  });
-
 }
 
 })();
