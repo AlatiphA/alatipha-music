@@ -1,4 +1,4 @@
-const CACHE_NAME = "alatipha-music-v2";
+const CACHE_NAME = "alatipha-music-v3";
 const SONG_CACHE = "alatipha-songs-v1";
 
 /* APP SHELL */
@@ -54,7 +54,7 @@ self.addEventListener("fetch", (event) => {
 
   const request = event.request;
 
-  /* 1. MP3 FILES (🔥 FIXED: CACHE FIRST) */
+  /* 1. MP3 FILES (ðŸ”¥ FIXED: CACHE FIRST) */
   if (request.url.includes(".mp3")) {
     event.respondWith(cacheAudioFirst(request));
     return;
@@ -62,18 +62,18 @@ self.addEventListener("fetch", (event) => {
 
   /* 2. HTML (NETWORK FIRST) */
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request)
-        .then((response) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, response.clone());
-            return response;
-          });
-        })
-        .catch(() => caches.match("./index.html"))
-    );
-    return;
-  }
+  event.respondWith(
+    fetch(request, { cache: "no-store" })
+      .then((response) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, response.clone());
+          return response;
+        });
+      })
+      .catch(() => caches.match("./index.html"))
+  );
+  return;
+}
 
   /* 3. OTHER ASSETS (STALE-WHILE-REVALIDATE) */
   event.respondWith(
@@ -95,7 +95,7 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-/* 🔥 AUDIO CACHE FUNCTION (NEW CORE FIX) */
+/* ðŸ”¥ AUDIO CACHE FUNCTION (NEW CORE FIX) */
 async function cacheAudioFirst(request) {
 
   const cache = await caches.open(SONG_CACHE);
