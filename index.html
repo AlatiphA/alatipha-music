@@ -29,9 +29,26 @@ content="black-translucent">
 
 </head>
 <body>
+<div id="menu-overlay" class="menu-overlay"></div>
+
+<div id="side-menu" class="side-menu">
+  <div class="menu-content">
+
+    <h3>AlatiphA Music</h3>
+
+    <button class="menu-item" data-view="home">Home</button>
+<button class="menu-item" data-view="favorites">Favorites</button>
+<button class="menu-item" data-view="downloads">Downloads</button>
+<button class="menu-item" data-view="about">About</button>
+
+  </div>
+</div>
 
 <div class="app">
-  <h2><i class="fas fa-music"></i> AlatiphA Music</h2>
+  <h2>
+  <i id="menu-toggle" class="fas fa-bars"></i>
+  AlatiphA Music
+</h2>
   
   <div class="search-container">
     <input type="text" id="search" placeholder="Search music...">
@@ -46,8 +63,8 @@ All Songs
 </button>
 
 <button class="tab-btn"
-data-playlist="newrelease">
-New Release
+data-playlist="recentlyadded">
+Recently Added 
 </button>
 
 <button class="tab-btn"
@@ -66,8 +83,8 @@ Remix
 </button>
 
 <button class="tab-btn"
-data-playlist="AfroBeat">
-Afro-beat
+data-playlist="afrobeats">
+Afrobeats
 </button>
 
 <button id="tab-favorites"
@@ -137,6 +154,11 @@ Favorites
       --accent: #c9a47f;
     }
   }
+  
+  html, body {
+  overscroll-behavior-y: contain;
+  touch-action: manipulation;
+}
 
   body {
     margin: 0;
@@ -149,7 +171,7 @@ Favorites
     padding: 20px 20px 240px;
     max-width: 960px;
     margin: auto;
-    text-align: center;
+    text-align: left;
   }
 
   h2 {
@@ -166,6 +188,66 @@ Favorites
     overflow-y:auto;
     overflow-x:hidden;   /* hide horizontal scrollbar */
     position:relative;
+}
+
+/* SIDE MENU */
+.side-menu {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 260px;
+  height: 100%;
+  background: var(--card);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.2);
+  z-index: 2000;
+  transition: left 0.3s ease;
+}
+
+.side-menu.open {
+  left: 0;
+}
+
+.menu-content {
+  padding: 20px;
+  text-align: left;
+}
+
+.menu-content h3 {
+  margin-bottom: 20px;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 8px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.menu-item:hover {
+  background: rgba(201,164,127,0.2);
+  border-radius: 8px;
+}
+
+/* OVERLAY */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.35);
+  z-index: 1500;
+  display: none;
+}
+
+.menu-overlay.show {
+  display: block;
 }
 
   /* SEARCH */
@@ -358,7 +440,7 @@ Favorites
   box-shadow: 0 -10px 30px var(--shadow);
   z-index: 1000;
   box-sizing: border-box;
-
+  
   transition: height 0.3s ease, transform 0.3s ease;
   will-change: transform;
   touch-action: pan-y;
@@ -431,6 +513,7 @@ box-shadow:
   overflow:hidden;
   white-space:nowrap;
   position:relative;
+  width: 100%; /* Update Marquee */
 }
 
 #title span{
@@ -440,17 +523,30 @@ box-shadow:
 
 /* animation */
 #title.marquee span{
-  animation:playerTicker linear infinite;
+  animation-name: playerTicker;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
-#title.marquee span::after{
-  content:attr(data-title);
-  padding-left:60px;
+#title.marquee span {
+  animation-name: playerTicker;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: 1.2s; /* smooth pause before scroll */
+}
+
+#title.marquee span::after {
+  content: attr(data-title);
+  padding-left: 60px;
+}
+
+.player.mini #title.marquee span::after {
+  padding-left: 40px;
 }
 
 @keyframes playerTicker{
-  0%{ transform:translateX(0); }
-  100%{ transform:translateX(-50%); }
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
 }
 
   #time {
@@ -628,6 +724,15 @@ box-shadow:
 .player.mini .info {
   flex: 1;
   text-align: left;
+    min-width: 0;
+}
+
+/* title */
+.player.mini #title {
+  font-size: 13px;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* hide heavy UI completely */
@@ -660,13 +765,6 @@ box-shadow:
   font-size: 18px !important;
 }
 
-/* title */
-.player.mini #title {
-  font-size: 13px;
-  width: 100%;
-  overflow: hidden;
-}
-
 /* collapse button stays visible */
 .player.mini #collapse-btn {
   opacity: 1;
@@ -676,57 +774,52 @@ box-shadow:
 </style>
 
 <script>
-(function() {
+(function(){
 
-const CURRENT_VERSION = "1.0.0"; // MUST match version.json
+// =======================
+// DOM LAYER
+// =======================
+const DOM = {
+  audio: document.getElementById("audio"),
+  list: document.getElementById("list"),
+  playBtn: document.getElementById("play"),
+  muteBtn: document.getElementById("mute"),
+  volume: document.getElementById("volume"),
+  menuBtn: document.getElementById("menu-btn"),
+  menuPopup: document.getElementById("menu"),
+  menuDownload: document.getElementById("menu-download"),
+  menuShare: document.getElementById("menu-share"),
+  bar: document.getElementById("bar"),
+  search: document.getElementById("search"),
+  clearBtn: document.getElementById("clear-search"),
+  tabFavorites: document.getElementById("tab-favorites"),
+  repeatBtn: document.getElementById("repeat"),
+  shuffleBtn: document.getElementById("shuffle"),
+  player: document.querySelector(".player"),
+  collapseBtn: document.getElementById("collapse-btn"),
+  cover: document.getElementById("cover"),
+  title: document.getElementById("title"),
+  time: document.getElementById("time"),
+  progress: document.getElementById("progress"),
 
-async function checkForUpdate() {
-  try {
-    const res = await fetch("./version.json", { cache: "no-store" });
-    const data = await res.json();
-
-    if (data.version !== CURRENT_VERSION) {
-      showUpdatePrompt();
-    }
-
-  } catch (err) {
-    console.warn("Version check failed", err);
-  }
-}
-
-function showUpdatePrompt() {
-  const box = document.createElement("div");
-
-  box.style.position = "fixed";
-  box.style.bottom = "90px";
-  box.style.left = "50%";
-  box.style.transform = "translateX(-50%)";
-  box.style.background = "#956433";
-  box.style.color = "#fff";
-  box.style.padding = "12px 16px";
-  box.style.borderRadius = "10px";
-  box.style.zIndex = "9999";
-  box.style.cursor = "pointer";
-
-  box.textContent = "New update available. Tap to refresh";
-
-  box.onclick = () => {
-    window.location.reload(true);
-  };
-
-  document.body.appendChild(box);
-}
+  sideMenu: document.getElementById("side-menu"),
+  overlay: document.getElementById("menu-overlay"),
+  menuToggle: document.getElementById("menu-toggle")
+};
 
 
+// =======================
+// DATA (SONGS)
+// =======================
 
-    const COVER =
+const COVER =
 "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi0_lQRpa_X50T-4zAAYHZUqeUjqDb-JkeOgmg31u_2Apnsut3Nfe_zrvW1rqOq7aKxEjzgxcv2ndc7CC-Jo_9O0pbmva3vn8N0xqiscfAah_frGjHgAsiSpwJSqnV976_5FtENJDnyuIcSEpW0T-LBQctvRczjy54IvEGCb86MXy2_CVCZphGwj2NjV6uc/s500/AlatiphA_Music_Animation.png";
 
 const songs = [
 { 
-   title:"Awake Ghana Youth",
+   title:"Awake Ghana Youth - AlatiphA", 
    src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Awake%2C%20Ghana%20Youth%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
-   tags: ["RnB"]
+   tags: ["rnb"]
 },
 
 { 
@@ -741,1286 +834,1329 @@ const songs = [
     tags: ["rap", "remix"]
 },
 
-        { title: "Geography of Greed - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Geography%20of%20greed%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{ 
+   title: "Geography of Greed - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Geography%20of%20greed%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 }, 
         
-        { title: "LGBTQ not Priority - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/LGBTQ%20%20Not%20a%20Priority%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{ 
+   title: "LGBTQ not Priority - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/LGBTQ%20%20Not%20a%20Priority%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Neutral no More - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Neutral%20No%20More%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{ 
+   title: "Neutral no More - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Neutral%20No%20More%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Preach Reset - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
-   tags: ["RnB"]
+{ 
+   title: "Preach Reset - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["rnb"]
 },  
 
-        { title: "Scorecard Flow - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Scorecard%20Flow%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{
+   title: "Scorecard Flow - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Scorecard%20Flow%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Stand or fall - AlatiphA ", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Stand%20or%20fall%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{
+   title: "Stand or fall - AlatiphA ", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Stand%20or%20fall%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Agyapadie Promax (State Capture) (R&B) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28R_B%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
-   tags: ["RnB"]
+{
+   title: "Agyapadie Promax (State Capture) (R&B) - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28R_B%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rnb"]
 },
 
-        { title: "Still Standing - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Still%20Standing%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{
+   title: "Still Standing - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Still%20Standing%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Too Big for Their Games - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Too%20Big%20for%20Their%20Games%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{
+   title: "Too Big for Their Games - AlatiphA",
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Too%20Big%20for%20Their%20Games%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Weatherproof Lies (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28Rap%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{ 
+   title: "Weatherproof Lies (Rap) - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28Rap%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Wo de ya ka - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Wo%20de%20ya%20ka%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
-   tags: ["rap", "Afrobeat"]
+{ 
+   title: "Wo de ya ka - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Wo%20de%20ya%20ka%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap", "afrobeats"]
 },
 
-         { title: "Yawa Season (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+{ title: "Yawa Season (Remix) - AlatiphA", 
+  src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
    tags: ["rap", "remix"]
 },
 
-       { title: "ORAL vs OCAL (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+{ 
+   title: "ORAL vs OCAL (Remix) - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
    tags: ["rap", "remix"]
 },
 
-        { title: "Weatherproof Lies (R&B) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
-   tags: ["RnB"]
+{ 
+   title: "Weatherproof Lies (R&B) - AlatiphA",  
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28R%26B%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["rnb"]
 },
 
-        { title: "Chalk Dust Promises - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{ 
+   title: "Chalk Dust Promises - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Chalk%20Dust%20Promises%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Rap Lyric Tribute – Shield and Pillar - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Rap%20Lyric%20Tribute%20%E2%80%93%20_Shield%20and%20Pillar_%28From%20Black%20Maria%20to%20their%20Commander%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+{
+   title: "Rap Lyric Tribute:“ Shield and Pillar - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Rap%20Lyric%20Tribute%20%E2%80%93%20_Shield%20and%20Pillar_%28From%20Black%20Maria%20to%20their%20Commander%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%20AI.mp3", 
+{ 
+   title: "Preach Reset (Rap) - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%20AI.mp3", 
    tags: ["rap"]
 },
-        
-     { title: "No Be Pawn (Remix) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
+
+{ 
+   title: "No Be Pawn (Remix) - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
    tags: ["rap", "remix"]
 },
- 
-        { title: "Agyapadie Promax (State Capture) (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
-   tags: ["rap"]
-},
-        
-        { title: "Awake, Ghana Youth (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Awake_%20Ghana%20Youth%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
-   tags: ["rap"]
-},
-  
-        { title: "Shee mungani - AlatiphA", src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Shee%20mungani%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
-   tags: ["rap", "AfroBeat"]
-},
-       
-           { title: "ORAL vs OCAL (Afro-beat) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20-%20AlatiphA%28MP3_160K%29.mp3", 
-   tags: ["rap", "AfroBeat"]
-},
-           
-         { title: "Preach Reset (Rap) - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+
+{
+   title: "Agyapadie Promax (State Capture) (Rap) - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Agyapadie%20Promax%20%28State%20Capture%29%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
 
-        { title: "Yawa Season - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
+{ 
+   title: "Awake, Ghana Youth (Rap) - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Awake_%20Ghana%20Youth%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+{
+   title: "Shee mungani - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Shee%20mungani%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
+   tags: ["rap", "afrobeats"]
+},
+
+{ 
+   title: "ORAL vs OCAL (Afrobeat) - AlatiphA",     
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/ORAL%20vs%20OCAL%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "afrobeats"]
+},
+
+{ 
+   title: "Preach Reset (Rap) - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Preach%20Reset%20%28Rap%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap"]
+},
+
+{
+   title: "Yawa Season - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
    tags: ["rap"]
 }, 
 
-       { title: "No Be Pawn - AlatiphA", src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/No%20Be%20Pawn%20-%20AlatiphA%28MP3_160K%29.mp3", 
-   tags: ["rap", "newrelease"]
+{
+   title: "No Be Pawn - AlatiphA", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/No%20Be%20Pawn%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   tags: ["rap", "recentlyadded"]
 }, 
 
-{ title: "Wins Only (Reset On Course) (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Wins%20Only%20%28Reset%20On%20Course%29%20%28Rap%29%20-%20AlatiphA.mp3", 
-   tags: ["rap", "newrelease"]
+{ 
+   title: "Wins Only (Reset On Course) (Rap) - AlatiphA", 
+   src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Wins%20Only%20%28Reset%20On%20Course%29%20%28Rap%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
 },
 
-       { title: "Galamsey Tears & Church Power (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Galamsey%20Tears%20%26%20Church%20Power%20%28Rap%29%20-%20AlatiphA.mp3", 
-   tags: ["rap", "newrelease"]
+{ 
+   title: "Galamsey Tears & Church Power (Rap) - AlatiphA", 
+   src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Galamsey%20Tears%20%26%20Church%20Power%20%28Rap%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
 },
 
-       { title: "Aku Deception (Rap) - AlatiphA", src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Aku%20Deception%20%28Rap%29%20-%20AlatiphA.mp3", 
-   tags: ["rap", "newrelease"]
+{ 
+   title: "Aku Deception (Rap) - AlatiphA", 
+   src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Aku%20Deception%20%28Rap%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
 }
   ];
-  
-  /* ADD SONGS TO PLAYLIST */
-  function getPlaylistByTag(tag){
 
-  const normalizedTag = (tag || "").toLowerCase();
 
-  return songs
-    .map((song, index) => ({ song, index }))
-    .filter(item => {
+// =======================
+// STATE LAYER
+// =======================
+const STATE = {
+  songs: songs,
+  currentIndex: (() => {
+  const i = parseInt(localStorage.getItem("index"));
+  return isNaN(i) ? 0 : i;
+})(),
 
-      if (normalizedTag === "all") return true;
+  favorites: JSON.parse(localStorage.getItem("favorites")) || [],
+  activePlaylist: "all",
+  showFavoritesOnly: false,
+  shuffle: false,
+  repeat: localStorage.getItem("repeat") || "off",
+  isMuted: JSON.parse(localStorage.getItem("muted")) || false,
+lastVolume: parseFloat(localStorage.getItem("volume")) || 1,
+  isMini: false,
+  isSeeking: false,
+  view: "home", 
+  touchStartTime: 0,
+  isSwipeAllowed: false,
+  durations: {}, 
+  renderTimer: null, 
+  nextBufferAudio: new Audio(), 
+};
 
-      if (!item.song.tags) return false;
+const DURATION_KEY = "alatipha_durations_v2";
 
-      return item.song.tags
-        .map(t => t.toLowerCase())
-        .includes(normalizedTag);
+try {
+  const cached = JSON.parse(localStorage.getItem(DURATION_KEY));
 
+  if (cached && typeof cached === "object") {
+    STATE.durations = cached.durations || {};
+    STATE.durationHash = cached.hash || "";
+  }
+
+} catch (e) {
+  STATE.durations = {};
+  STATE.durationHash = "";
+}
+
+function generateSongHash() {
+  return STATE.songs.map(s => s.src).join("|");
+}
+
+console.log("Songs loaded:", STATE.songs.length);
+
+//DURATION LOADER 
+function loadDurations() {
+
+  const currentHash = generateSongHash();
+
+  // ✅ If songs unchanged and durations exist → STOP
+  if (
+    STATE.durationHash === currentHash &&
+    Object.keys(STATE.durations).length === STATE.songs.length
+  ) {
+    console.log("Durations already cached. Skipping scan.");
+    return;
+  }
+
+  console.log("Scanning durations...");
+
+  STATE.durationHash = currentHash;
+
+  let index = 0;
+
+  function scanNext() {
+
+    if (index >= STATE.songs.length) {
+      console.log("Duration scan complete.");
+      saveDurations();
+      return;
+    }
+
+    // skip already cached
+    if (STATE.durations[index]) {
+      index++;
+      scanNext();
+      return;
+    }
+
+    const audio = new Audio();
+    audio.src = STATE.songs[index].src;
+    audio.preload = "metadata";
+
+    audio.addEventListener("loadedmetadata", () => {
+
+      const duration = audio.duration;
+
+      if (duration && isFinite(duration)) {
+        STATE.durations[index] = duration;
+
+        // Save progressively (safe)
+        saveDurations();
+
+        // Update only that item visually
+        updateSingleDuration(index, duration);
+      }
+
+      index++;
+
+      // throttle to avoid UI lag
+      setTimeout(scanNext, 150);
     });
 
-}
-
-  let activePlaylist="all";
-  let showFavoritesOnly = false;
-
-  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-  let currentIndex = parseInt(localStorage.getItem("index")) || 0;
-  
-  const ROW_HEIGHT = 50;   // height of each song row
-   const VISIBLE_ROWS = 12; // 10 visible rows + 2 buffer rows
-   
-   let startIndex = 0;
-
-  let shuffle = false;
-  let repeat = "off";
-  let isMuted = false;
-  let lastVolume = 1;
-  let durations = {};
-
-  let startY = 0;
-  let currentY = 0;
-  let isDragging = false;
-  let hasMoved = false;
-  
-  let nextPreloaded=false;
-  let nextSongIndex=null;
-
-/* hidden second deck */
-let nextBufferAudio=new Audio();
-nextBufferAudio.crossOrigin="anonymous";
-nextBufferAudio.preload="auto";
-
-/* keep settings synced */
-  let dragThreshold = 60; // how far before toggle triggers
-
-  const audio = document.getElementById("audio");
-  const list = document.getElementById("list");
-  const playBtn = document.getElementById("play");
-  const muteBtn = document.getElementById("mute");
-  const volumeSlider = document.getElementById("volume");
-  const menuBtn = document.getElementById("menu-btn");
-  const menuPopup = document.getElementById("menu");
-  const menuDownload = document.getElementById("menu-download");
-  const menuShare = document.getElementById("menu-share");
-  const bar = document.getElementById("bar");
-  const searchInput = document.getElementById("search");
-  const clearBtn = document.getElementById("clear-search");
-  
-  const tabFavorites = document.getElementById("tab-favorites");
-    
-  const repeatBtn = document.getElementById("repeat");
-  const shuffleBtn = document.getElementById("shuffle");
-  
-  const player = document.querySelector(".player");
-const collapseBtn = document.getElementById("collapse-btn");
-
-const cover = document.getElementById("cover");
-
-nextBufferAudio.volume = audio.volume;
-
-let isMini = false;
-
-collapseBtn.addEventListener("click", function(e){
-  e.stopPropagation();
-
-  isMini = !isMini;
-
-  player.classList.toggle("mini", isMini);
-
-  collapseBtn.innerHTML = isMini
-   ? '<i class="fas fa-chevron-up"></i>'
-   : '<i class="fas fa-chevron-down"></i>';
-
-setTimeout(updateNowPlayingMarquee, 50);
-
-});
-
-  function getCurrentPlaylist(){
-
-  if(showFavoritesOnly){
-    return songs
-      .map((song, index) => ({ song, index }))
-      .filter(item => favorites.includes(item.index));
+    audio.addEventListener("error", () => {
+      index++;
+      setTimeout(scanNext, 150);
+    });
   }
 
-  return getPlaylistByTag(activePlaylist);
-
+  scanNext();
 }
 
-  function updateRepeatButton() {
-    repeatBtn.classList.remove("active");
+function updateSingleDuration(index, duration) {
 
-    if (repeat === "off") {
-      repeatBtn.innerHTML = '<i class="fas fa-redo"></i>';
-    } else if (repeat === "one") {
-      repeatBtn.classList.add("active");
-      repeatBtn.innerHTML = '<i class="fas fa-redo"></i>';
-    } else {
-      repeatBtn.classList.add("active");
-      repeatBtn.innerHTML = '<i class="fas fa-repeat"></i>';
-    }
+  const el = DOM.list.querySelector(
+    `.song[data-index="${index}"] .duration`
+  );
+
+  if (el) {
+    el.textContent = formatTime(duration);
   }
+}
 
-  function getFilteredSongs(filter=""){
+function saveDurations() {
+  try {
+    localStorage.setItem(
+      DURATION_KEY,
+      JSON.stringify({
+        durations: STATE.durations,
+        hash: STATE.durationHash
+      })
+    );
+  } catch (e) {
+    console.log("Duration save failed", e);
+  }
+}
 
-  const playlist = getCurrentPlaylist();
 
-  return playlist.filter(item => {
 
-    if(!item.song.title.toLowerCase().includes(filter.toLowerCase())){
-      return false;
-    }
 
-    return true;
 
+// =======================
+// LOGIC
+// =======================
+
+function scheduleRender() {
+
+  if (STATE.renderTimer) return;
+
+  STATE.renderTimer = requestAnimationFrame(() => {
+    renderList(DOM.search.value);
+    STATE.renderTimer = null;
   });
-
 }
 
-function renderList(filter=""){
 
-const filteredSongs =
-getFilteredSongs(filter);
+function loadSong(){
+  const song = STATE.songs[STATE.currentIndex];
+  if(!song) return;
 
-list.innerHTML="";
+  DOM.audio.src = song.src;
+  DOM.cover.src = song.cover || COVER || "";
+    if (!DOM.cover.src) {
+  DOM.cover.src = COVER;
+}
 
-/* fake full height so scrollbar feels normal */
-const spacer=document.createElement("div");
-spacer.style.height=
-(filteredSongs.length * ROW_HEIGHT)+"px";
+  DOM.title.innerHTML =
+    `<span data-title="${song.title}">${song.title}</span>`;
+    
+  DOM.cover.classList.add("loading");
 
-list.appendChild(spacer);
+  DOM.audio.addEventListener("canplay", () => {
+  DOM.cover.classList.remove("loading");
+}, { once: true });
 
+  updateMarquee();
 
-/* only 10 recycled rows */
-for(
-let row=0;
-row<VISIBLE_ROWS;
-row++
-){
+  DOM.playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  DOM.playBtn.classList.remove("pause");
+}
 
-let songIndex=startIndex+row;
+function playSong(){
+  DOM.audio.play().then(()=>{
+    DOM.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+    DOM.playBtn.classList.add("pause");
+    DOM.cover.classList.add("playing");
+    setTimeout(preloadNextTrack, 200);
+    savePlaybackState(true);
+  });
+}
 
-if(songIndex>=filteredSongs.length)
-break;
+function pauseSong(){
+  DOM.audio.pause();
+  DOM.playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  DOM.playBtn.classList.remove("pause");
+  DOM.cover.classList.remove("playing");
+  savePlaybackState(false);
+}
 
-let item = filteredSongs[songIndex];
-let song = item.song;
-let i = item.index;
+function nextSong(){
+  STATE.currentIndex =
+    (STATE.currentIndex + 1) % STATE.songs.length;
 
-const div=document.createElement("div");
+  saveState();
+  loadSong();
+  playSong();
+}
 
-div.className="song";
-div.dataset.index=i;
+function prevSong(){
+  STATE.currentIndex =
+    (STATE.currentIndex - 1 + STATE.songs.length) % STATE.songs.length;
 
-div.style.position="absolute";
-div.style.top=
-(songIndex*ROW_HEIGHT)+"px";
+  saveState();
+  loadSong();
+  playSong();
+}
 
-const isFav=
-favorites.includes(i);
+function updateRepeatButton() {
 
-const dur=
-durations[i] ?? "";
+  DOM.repeatBtn.classList.remove("active");
 
-div.innerHTML=`
-<img
-loading="lazy"
-src="${song.cover || COVER}">
-
-<span>
-  <span 
-    class="song-title"
-    data-title="${song.title}">
-    ${song.title}
-  </span>
-</span>
-
-<div class="song-right">
-<span class="duration">
-${dur}
-</span>
-
-<button class="heart ${
-isFav?'liked':''
-}">
-<i class="${
-isFav?'fas':'far'
-} fa-heart"></i>
-</button>
-
-</div>
-`;
-
-div.onclick=e=>{
-
-if(e.target.closest('.heart'))
-return;
-
-currentIndex=i;
-
-loadSong();
-playSong();
-highlight();
-saveState();
-
-};
-
-div.querySelector('.heart').onclick = e => {
-
-  e.stopPropagation();
-
-  if(favorites.includes(i)){
-    favorites = favorites.filter(x => x !== i);
-  } else {
-    favorites.push(i);
+  if (STATE.repeat === "off") {
+    DOM.repeatBtn.innerHTML = '<i class="fas fa-redo"></i>';
   }
 
-  localStorage.setItem('favorites', JSON.stringify(favorites));
+  if (STATE.repeat === "one") {
+    DOM.repeatBtn.classList.add("active");
+    DOM.repeatBtn.innerHTML = '<i class="fas fa-redo"></i>';
+  }
 
-  renderList(searchInput.value);
-};
-
-
-list.appendChild(div);
-
-}
-
-highlight();
-
-}
-
-function updateActiveTab(){
-
-document
-.querySelectorAll(".tab-btn")
-.forEach(btn=>btn.classList.remove("active"));
-
-if(showFavoritesOnly){
-tabFavorites.classList.add("active");
-return;
-}
-
-const activeBtn = [...document.querySelectorAll("[data-playlist]")]
-  .find(btn => btn.dataset.playlist.toLowerCase() === activePlaylist);
-
-if(activeBtn){
-activeBtn.classList.add("active");
-}
-
-}
-
-  function loadSong(){
-  
-  nextPreloaded = false;
-
-if(currentIndex < 0 || currentIndex >= songs.length){
-currentIndex=0;
-}
-
-const cover=document.getElementById("cover");
-
-/* DO NOT remove playing here */
-if(audio.paused){
-  cover.classList.remove("paused");
-  cover.classList.add("loading");
-}
-
-if (audio.src !== songs[currentIndex].src) {
-  audio.src = songs[currentIndex].src;
-}
-
-const titleEl = document.getElementById("title");
-
-titleEl.innerHTML =
-`<span data-title="${songs[currentIndex].title}">
-${songs[currentIndex].title}
-</span>`;
-
-updateNowPlayingMarquee();
-cacheCurrentSong();
-
-/* swap art without touching animation */
-cover.src = songs[currentIndex].cover || COVER;
-updateMediaSession();
-
-playBtn.innerHTML=
-'<i class="fas fa-play"></i>';
-
-playBtn.classList.remove("pause");
-
-updateMenuButtons();
-}
-
-/* metadata loaded, stop loader */
-audio.addEventListener("loadedmetadata",function(){
-
-const cover=document.getElementById("cover");
-
-/* Stop loading animation */
-cover.classList.remove("loading");
-
-/* Save duration only for this song */
-const m=Math.floor(audio.duration/60);
-const s=Math.floor(audio.duration%60);
-
-durations[currentIndex]=
-`${m}:${s<10?'0':''}${s}`;
-
-/* refresh song list so duration appears */
-renderList(searchInput.value);
-
-/* keep your spinning logic */
-if(!audio.paused){
-cover.classList.remove("paused");
-cover.classList.add("playing");
-}else{
-cover.classList.remove("playing");
-cover.classList.add("paused");
-}
-
-});
-
-function updateMediaSession(){
-
-if(!("mediaSession" in navigator))
-return;
-
-navigator.mediaSession.metadata =
-new MediaMetadata({
-
-title:
-songs[currentIndex].title,
-
-artist:
-"AlatiphA",
-
-album:
-"AlatiphA Music",
-
-artwork:[
-{
-src:
-songs[currentIndex].cover || COVER,
-sizes:"512x512",
-type:"image/png"
-}
-]
-
-});
-
-navigator.mediaSession.setActionHandler(
-"play",
-()=>playSong()
-);
-
-navigator.mediaSession.setActionHandler(
-"pause",
-()=>pauseSong()
-);
-
-navigator.mediaSession.setActionHandler(
-"previoustrack",
-()=>{
-document
-.getElementById("prev")
-.click();
-});
-
-navigator.mediaSession.setActionHandler(
-"nexttrack",
-()=>{
-document
-.getElementById("next")
-.click();
-});
-
-navigator.mediaSession.setActionHandler(
-"seekbackward",
-()=>{
-audio.currentTime=
-Math.max(
-audio.currentTime-10,
-0
-);
-});
-
-navigator.mediaSession.setActionHandler(
-"seekforward",
-()=>{
-audio.currentTime=
-Math.min(
-audio.currentTime+10,
-audio.duration
-);
-});
-
+  if (STATE.repeat === "all") {
+    DOM.repeatBtn.classList.add("active");
+    DOM.repeatBtn.innerHTML = '<i class="fas fa-repeat"></i>';
+  }
 }
 
 function preloadNextTrack() {
 
-const playlist = getCurrentPlaylist();
-if (!playlist.length) return;
+  const nextIndex = getNextIndex("next");
+  if (nextIndex === null) return;
 
-let nextPos;
+  const nextSong = STATE.songs[nextIndex];
+  if (!nextSong) return;
 
-if (shuffle) {
-  nextPos = getNextShuffleIndex(playlist);
-} else {
-  const currentPos = getCurrentPlaylistIndex();
-  nextPos = (currentPos + 1) % playlist.length;
+  if (STATE.nextBufferAudio.src === nextSong.src) return;
+
+  STATE.nextSongIndex = nextIndex;
+
+  STATE.nextBufferAudio.src = nextSong.src;
+  STATE.nextBufferAudio.load();
+
+  STATE.nextBufferAudio.play()
+    .then(() => {
+      STATE.nextBufferAudio.pause();
+      STATE.nextBufferAudio.currentTime = 0;
+    })
+    .catch(() => {});
 }
 
-const nextSong = playlist[nextPos];
 
-nextSongIndex = songs.findIndex(
-  s => s.src === nextSong.song.src
-);
-
-if (nextSongIndex < 0) return;
-
-if (nextBufferAudio.src === songs[nextSongIndex].src) return;
-
-nextBufferAudio.src = songs[nextSongIndex].src;
-nextBufferAudio.load();
-
-/* FORCE BUFFER */
-nextBufferAudio.play().then(() => {
-  nextBufferAudio.pause();
-  nextBufferAudio.currentTime = 0;
-}).catch(() => {});
+function saveState(){
+  localStorage.setItem("index", STATE.currentIndex);
 }
 
-function cacheCurrentSong() {
-
-  if (!("caches" in window)) return;
-
-  caches.open("alatipha-songs-v1").then(cache => {
-    cache.add(songs[currentIndex].src).catch(() => {});
-  });
-
+function savePlaybackState(isPlaying) {
+  localStorage.setItem("isPlaying", isPlaying);
 }
 
-function pauseSong(){
+function renderList(filter=""){
 
-audio.pause();
-
-const cover=document.getElementById("cover");
-
-playBtn.innerHTML=
-'<i class="fas fa-play"></i>';
-
-playBtn.classList.remove("pause");
-
-if("mediaSession" in navigator){
-navigator.mediaSession.playbackState=
-"paused";
-}
-
-cover.classList.remove(
-"playing",
-"loading"
-);
-
-cover.classList.add("paused");
-
-}
-
-function playSong(){
-
-audio.play().then(()=>{
-
-playBtn.innerHTML =
-'<i class="fas fa-pause"></i>';
-
-playBtn.classList.add("pause");
-
-if("mediaSession" in navigator){
-navigator.mediaSession.playbackState=
-"playing";
-}
-
-cover.classList.remove(
-"loading",
-"paused"
-);
-
-cover.classList.add("playing");
-
-/* warm next track shortly after playback starts */
-setTimeout(preloadNextTrack, 200);
-
-}).catch(err=>{console.warn(err);
-});
-
-}
-
-  function highlight() {
-    document.querySelectorAll(".song").forEach(el => {
-      const idx = parseInt(el.dataset.index);
-      el.classList.toggle("active", idx === currentIndex);
-    });
-  }
-
-  function saveState() {
-    localStorage.setItem("index", currentIndex);
-  }
-
-  function updateMenuButtons() {
-    const song = songs[currentIndex];
-    if (!song) return;
-
-    menuDownload.onclick = () => {
-      const a = document.createElement("a");
-      a.href = song.src;
-      a.download = song.title + ".mp3";
-      a.click();
-      menuPopup.style.display = "none";
-    };
-
-    menuShare.onclick = async () => {
-
-const shareData = {
-  title: song.title,
-  text: `Now Playing: ${song.title} by AlatiphA`,
-  url: song.src
-};
-
-try{
-
- if(navigator.share){
-   await navigator.share(shareData);
- }else{
-   await navigator.clipboard.writeText(song.src);
-   alert("Link copied!");
- }
-
-}catch(err){
-
- try{
-   await navigator.clipboard.writeText(song.src);
-   alert("Link copied to clipboard.");
- }catch(e){
-   alert("Unable to share link.");
- }
-
-}
-
-menuPopup.style.display="none";
-
-};
-  }
-
-  shuffleBtn.onclick = () => {
-    shuffle = !shuffle;
-    shuffleBtn.classList.toggle("active", shuffle);
-  };
-
-  repeatBtn.onclick = () => {
-    if (repeat === "off") repeat = "one";
-    else if (repeat === "one") repeat = "all";
-    else repeat = "off";
-    updateRepeatButton();
-  };
-
-  muteBtn.onclick = () => {
-    isMuted = !isMuted;
-    if (isMuted) {
-      lastVolume = audio.volume || 1;
-      audio.volume = 0;
-      muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-      muteBtn.classList.add("active");
-      volumeSlider.value = 0;
-    } else {
-      audio.volume = lastVolume;
-      muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-      muteBtn.classList.remove("active");
-      volumeSlider.value = lastVolume;
-      nextBufferAudio.volume=audio.volume;
-    }
-  };
-
-  volumeSlider.oninput = () => {
- audio.volume = volumeSlider.value;
- nextBufferAudio.volume = audio.volume;
-
- if(audio.volume > 0){
-   lastVolume = audio.volume;
-   isMuted = false;
-   muteBtn.classList.remove("active");
-   muteBtn.innerHTML =
-   '<i class="fas fa-volume-up"></i>';
- }
-};
-
-  function updateClearButton() {
-    clearBtn.style.display = searchInput.value.length > 0 ? "block" : "none";
-  }
-
-  searchInput.oninput = (e) => {
-    renderList(e.target.value);
-    updateClearButton();
-  };
-
-  clearBtn.onclick = () => {
-    searchInput.value = "";
-    renderList("");
-    updateClearButton();
-    searchInput.focus();
-  };
-
-tabFavorites.onclick = () => {
-  showFavoritesOnly = true;
-  startIndex = 0; // reset scroll
-
-  updateActiveTab();
-  renderList(searchInput.value);
-};
-
-  playBtn.onclick = () => audio.paused ? playSong() : pauseSong();
-
-  function getNextShuffleIndex(playlist) {
-
-  let newIdx;
-
-  do {
-    newIdx = Math.floor(Math.random() * playlist.length);
-  } while (
-    playlist.length > 1 &&
-    playlist[newIdx].index === currentIndex
-  );
-
-  return newIdx;
-
-}
-  
-  function getCurrentPlaylistIndex(){
+  DOM.list.innerHTML = "";
 
   const playlist = getCurrentPlaylist();
 
-  return playlist.findIndex(item => item.index === currentIndex);
+  playlist.forEach(item => {
 
-}
+    const song = item.song;
+    const i = item.index;
 
-  document.getElementById("next").onclick = () => {
+    const hasFilter = filter.trim() !== "";
+const isMatch = song.title.toLowerCase().includes(filter.toLowerCase());
+const isCurrent = i === STATE.currentIndex;
 
-const playlist = getCurrentPlaylist();
-if (!playlist.length) return;
+// Only filter when user is actually searching
+if (hasFilter && !isMatch && !isCurrent) return;
 
-/* USE PRELOADED TRACK IF AVAILABLE */
-if (nextBufferAudio && nextSongIndex !== null) {
+    const div = document.createElement("div");
+    div.className = "song";
+    div.dataset.index = i;
 
-  audio.pause();
+    const isFav = STATE.favorites.includes(i);
 
-  audio.src = nextBufferAudio.src;
-  currentIndex = nextSongIndex;
+    const duration = STATE.durations[i];
+
+div.innerHTML = `
+  <img src="${song.cover || COVER}">
+  <span>${song.title}</span>
+
+  <div class="song-right">
+    <span class="duration">
+      ${duration ? formatTime(duration) : "…"}
+    </span>
+
+    <button class="heart ${isFav ? "liked" : ""}">
+      <i class="${isFav ? "fas" : "far"} fa-heart"></i>
+    </button>
+  </div>
+`;
+
+
+    // play
+    div.onclick = (e) => {
+
+  if (e.target.closest(".heart")) return;
+
+  if (STATE.currentIndex === i) {
+    // toggle play/pause instead
+    DOM.audio.paused ? playSong() : pauseSong();
+    return;
+  }
+
+  STATE.currentIndex = i;
 
   loadSong();
-  audio.play();
-
-  highlight();
+  playSong();
+  highlightActiveTrack();
   saveState();
-
-  nextPreloaded = false;
-  setTimeout(preloadNextTrack, 200);
-
-  return;
-}
-
-/* FALLBACK */
-
-if (shuffle) {
-  let newIdx = getNextShuffleIndex(playlist);
-  currentIndex = songs.findIndex(
-    s => s.src === playlist[newIdx].song.src
-  );
-} else {
-  const currentPos = getCurrentPlaylistIndex();
-  const nextPos = (currentPos + 1) % playlist.length;
-  currentIndex = songs.findIndex(
-    s => s.src === playlist[nextPos].song.src
-  );
-}
-
-loadSong();
-playSong();
-highlight();
-saveState();
 };
 
-  document.getElementById("prev").onclick = () => {
+    // favorite
+    div.querySelector(".heart").onclick = (e)=>{
+      e.stopPropagation();
 
-const playlist = getCurrentPlaylist();
-if (!playlist.length) return;
+      if(STATE.favorites.includes(i)){
+        STATE.favorites =
+          STATE.favorites.filter(x=>x!==i);
+      }else{
+        STATE.favorites.push(i);
+      }
 
-const currentPos = getCurrentPlaylistIndex();
-const prevPos = (currentPos - 1 + playlist.length) % playlist.length;
+      localStorage.setItem(
+        "favorites",
+        JSON.stringify(STATE.favorites)
+      );
 
-currentIndex = songs.findIndex(
-  s => s.src === playlist[prevPos].song.src
-);
+      renderList(DOM.search.value);
+    };
 
-loadSong();
-playSong();
-highlight();
-saveState();
-
-setTimeout(preloadNextTrack, 200);
-};
-
-  audio.addEventListener("timeupdate", () => {
-
-if (!audio.duration) return;
-
-document.getElementById("progress").style.width =
-(audio.currentTime / audio.duration) * 100 + "%";
-
-document.getElementById("time").textContent =
-formatTime(audio.currentTime) +
-" / " +
-formatTime(audio.duration);
-
-if(
-"setPositionState"
-in navigator.mediaSession
-){
-
-navigator.mediaSession
-.setPositionState({
-duration:audio.duration,
-playbackRate:audio.playbackRate,
-position:audio.currentTime
-});
+    DOM.list.appendChild(div);
+  });
 
 }
 
-/* Preload next track in final 30 seconds */
-if (
-  audio.duration &&
-  audio.duration - audio.currentTime < 30 &&
-  !nextPreloaded
-) {
-  nextPreloaded = true;
-  preloadNextTrack();
-}
+function updateMarquee() {
 
-});
+  const span = DOM.title.querySelector("span");
+  if (!span) return;
 
-  bar.onclick = (e) => {
-    if (!audio.duration) return;
-    const rect = bar.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-  };
+  // reset first
+  DOM.title.classList.remove("marquee");
+  span.style.animationDuration = "0s";
 
-  function formatTime(s) {
-    const m = Math.floor(s / 60);
-    const sec = Math.floor(s % 60);
-    return m + ":" + (sec < 10 ? "0" : "") + sec;
-  }
-  
-function startDrag(y) {
-  isDragging = true;
-  hasMoved = false;
-  startY = y;
-  currentY = y;
+  // WAIT for layout to settle properly
+  setTimeout(() => {
 
-  player.style.transition = "none";
-}
+    const textWidth = span.scrollWidth;
+    const containerWidth = DOM.title.clientWidth;
 
-function moveDrag(y) {
-  if (!isDragging) return;
+    // debug (optional)
+    // console.log({ textWidth, containerWidth });
 
-  currentY = y;
+    if (textWidth > containerWidth) {
 
-  let delta = (currentY - startY) * 0.6;
+      // slower base speed
+let speed = 30;
 
-  const maxDown = 120;
-  const maxUp = -120;
+// even slower in mini player (feels more natural)
+if (STATE.isMini) speed = 22;
 
-  if (delta > maxDown) delta = maxDown;
-  if (delta < maxUp) delta = maxUp;
+const gap = STATE.isMini ? 40 : 60;
+const distance = textWidth + gap;
 
-  if (Math.abs(delta) > 8) {
-    hasMoved = true;
-  }
-
-  player.style.transform = `translateY(${delta}px)`;
-}
-
-function updateNowPlayingMarquee(){
-
-const titleEl = document.getElementById("title");
-const span = titleEl.querySelector("span");
-
-if(!span) return;
-
-/* reset first */
-titleEl.classList.remove("marquee");
-span.style.animationDuration = "";
-
-/* wait for layout to settle */
-requestAnimationFrame(()=>{
-requestAnimationFrame(()=>{
-
-if(span.scrollWidth > titleEl.clientWidth){
-
-const distance = span.scrollWidth;
-const duration = Math.max(8, distance / 18);
+// minimum duration so short overflow doesn't rush
+let duration = distance / speed;
+duration = Math.max(duration, 6); // never faster than 6s
 
 span.style.animationDuration = duration + "s";
 
-titleEl.classList.add("marquee");
+      span.style.animationDuration = duration + "s";
 
+      DOM.title.classList.add("marquee");
+    }
+
+  }, 50); // small delay is key
 }
 
-});
-});
+function updateTime(){
+  if(!DOM.audio.duration) return;
 
+  if (!STATE.isSeeking) {
+  DOM.progress.style.width =
+    (DOM.audio.currentTime / DOM.audio.duration) * 100 + "%";
 }
 
-function endDrag() {
-  if (!isDragging) return;
+  DOM.time.textContent =
+    formatTime(DOM.audio.currentTime) +
+    " / " +
+    formatTime(DOM.audio.duration);
+}
 
-  isDragging = false;
+function formatTime(s) {
 
-  const delta = currentY - startY;
+  if (!s || isNaN(s) || !isFinite(s)) return "--:--";
 
-  player.style.transition = "height 0.3s ease, transform 0.3s ease";
-  player.style.transform = "";
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
 
-  /* drag down -> mini */
-  if (delta > dragThreshold && !isMini) {
-    isMini = true;
-    player.classList.add("mini");
+  return m + ":" + (sec < 10 ? "0" : "") + sec;
+}
 
-    collapseBtn.innerHTML =
-      '<i class="fas fa-chevron-up"></i>';
+function getPlaylistByTag(tag){
+
+  const normalized = (tag || "").toLowerCase();
+
+  return STATE.songs
+    .map((song, index) => ({ song, index }))
+    .filter(item => {
+
+      if(normalized === "all") return true;
+
+      if(!item.song.tags) return false;
+
+      return item.song.tags
+        .map(t => t.toLowerCase())
+        .includes(normalized);
+
+    });
+}
+
+function getCurrentPlaylist(){
+
+  if(STATE.showFavoritesOnly){
+    return STATE.songs
+      .map((song,index)=>({song,index}))
+      .filter(item => STATE.favorites.includes(item.index));
   }
 
-  /* drag up -> expand */
-  else if (delta < -dragThreshold && isMini) {
-    isMini = false;
-    player.classList.remove("mini");
+  return getPlaylistByTag(STATE.activePlaylist);
+}
 
-    collapseBtn.innerHTML =
-      '<i class="fas fa-chevron-down"></i>';
+// SWITCH VIEW HELPER 
+
+function resetUIState() {
+  DOM.search.value = "";
+  DOM.clearBtn.style.display = "none";
+}
+
+// SWITCH VIEW 
+function switchView(view) {
+
+  if (view === "home") {
+    STATE.showFavoritesOnly = false;
+    STATE.activePlaylist = "all";
+    renderList(DOM.search.value);
   }
 
-  setTimeout(function () {
-    hasMoved = false;
-  }, 120);
-  
-  setTimeout(updateNowPlayingMarquee, 50);
+  if (view === "favorites") {
+    STATE.showFavoritesOnly = true;
+    renderList(DOM.search.value);
+  }
+
+  if (view === "downloads") {
+    renderDownloads();
+  }
+
+  if (view === "about") {
+    showAbout();
+  }
+
+  updateActiveTab();
 }
 
- audio.addEventListener("ended", function(){
 
-const playlist = getCurrentPlaylist();
-if(!playlist.length) return;
+function renderDownloads() {
 
-/* REPEAT ONE */
-if(repeat === "one"){
-audio.currentTime = 0;
-playSong();
-return;
+  const downloaded = JSON.parse(localStorage.getItem("downloads")) || [];
+
+  DOM.list.innerHTML = "";
+
+  downloaded.forEach(index => {
+
+    const song = STATE.songs[index];
+    if (!song) return;
+
+    const div = document.createElement("div");
+    div.className = "song";
+
+    div.innerHTML = `
+      <img src="${song.cover || COVER}">
+      <span>${song.title}</span>
+    `;
+
+    div.onclick = () => {
+      STATE.currentIndex = index;
+      loadSong();
+      playSong();
+      saveState();
+    };
+
+    DOM.list.appendChild(div);
+  });
 }
 
-const currentPos = getCurrentPlaylistIndex();
-const isLastTrack =
-!shuffle &&
-currentPos === playlist.length - 1;
+function showAbout() {
 
-/* REPEAT OFF + last song => stop */
-if(
-repeat === "off" &&
-isLastTrack
-){
-pauseSong();
-audio.currentTime = 0;
-return;
+  DOM.list.innerHTML = `
+    <div style="padding:15px; line-height:1.6;">
+      <h3>AlatiphA Music</h3>
+      <p>Offline-first music player using Service Worker caching.</p>
+      <p>Version: v6</p>
+    </div>
+  `;
 }
 
-/* GAPLESS NEXT TRACK */
-if(
-nextBufferAudio &&
-nextSongIndex !== null
-){
+/* 🔥 SOURCE OF TRUTH FOR NAVIGATION */
+function getNextIndex(direction = "next") {
 
-audio.pause();
+  const playlist = getCurrentPlaylist();
+  if (!playlist.length) return null;
 
-audio.src = nextBufferAudio.src;
+  const currentPos = playlist.findIndex(
+    item => item.index === STATE.currentIndex
+  );
 
-currentIndex = nextSongIndex;
+  if (currentPos === -1) return null;
 
-const titleEl = document.getElementById("title");
+  // REPEAT ONE
+  if (STATE.repeat === "one") {
+    return STATE.currentIndex;
+  }
 
-titleEl.innerHTML =
-`<span data-title="${songs[currentIndex].title}">
-${songs[currentIndex].title}
-</span>`;
+  // SHUFFLE
+  if (STATE.shuffle) {
 
-requestAnimationFrame(function(){
+    if (playlist.length === 1) return STATE.currentIndex;
 
-const span = titleEl.querySelector("span");
+    let newPos;
 
-if(span.scrollWidth > titleEl.clientWidth){
+    do {
+      newPos = Math.floor(Math.random() * playlist.length);
+    } while (playlist[newPos].index === STATE.currentIndex);
 
-const distance = span.scrollWidth;
-const duration = Math.max(8, distance / 18);
+    return playlist[newPos].index;
+  }
 
-span.style.animationDuration = duration + "s";
+  // NORMAL MOVE
+  let newPos = direction === "next"
+    ? currentPos + 1
+    : currentPos - 1;
 
-titleEl.classList.add("marquee");
+  // REPEAT ALL
+  if (STATE.repeat === "all") {
+    if (newPos >= playlist.length) newPos = 0;
+    if (newPos < 0) newPos = playlist.length - 1;
+  }
 
-}else{
-titleEl.classList.remove("marquee");
+  // REPEAT OFF
+  if (STATE.repeat === "off") {
+    if (newPos >= playlist.length || newPos < 0) {
+      return null;
+    }
+  }
+
+  return playlist[newPos].index;
 }
 
+//SHUFFLE 
+function updateShuffleButton() {
+  DOM.shuffleBtn.classList.toggle("active", STATE.shuffle);
+}
+
+//VOLUME & MUTE 
+function updateVolumeUI() {
+
+  DOM.volume.value = STATE.isMuted ? 0 : STATE.lastVolume;
+
+  if (STATE.isMuted || STATE.lastVolume === 0) {
+    DOM.muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    DOM.muteBtn.classList.add("active");
+  } else {
+    DOM.muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    DOM.muteBtn.classList.remove("active");
+  }
+}
+
+function applyVolume() {
+
+  DOM.audio.volume = STATE.isMuted ? 0 : STATE.lastVolume;
+
+  updateVolumeUI();
+}
+
+//TIME UPDATER 
+function seek(e) {
+
+  const rect = DOM.bar.getBoundingClientRect();
+  const x = e.touches ? e.touches[0].clientX : e.clientX;
+
+  let percent = (x - rect.left) / rect.width;
+
+  percent = Math.max(0, Math.min(1, percent));
+
+  DOM.progress.style.width = (percent * 100) + "%";
+
+  if (DOM.audio.duration) {
+    DOM.audio.currentTime = percent * DOM.audio.duration;
+  }
+}
+
+DOM.bar.addEventListener("click", seek);
+
+//Start dragging
+DOM.bar.addEventListener("mousedown", (e) => {
+  STATE.isSeeking = true;
+  seek(e);
 });
 
-cover.src =
-songs[currentIndex].cover || COVER;
-
-highlight();
-saveState();
-
-audio.play().then(()=>{
-
-cover.classList.remove(
-"loading",
-"paused"
-);
-
-cover.classList.add(
-"playing"
-);
-
-nextPreloaded = false;
-
-requestAnimationFrame(
-preloadNextTrack
-);
-
+DOM.bar.addEventListener("touchstart", (e) => {
+  STATE.isSeeking = true;
+  seek(e);
 });
 
-return;
-}
-
-/* FALLBACK NAVIGATION */
-
-if(shuffle){
-
-let newIdx =
-getNextShuffleIndex(playlist);
-
-currentIndex =
-songs.findIndex(
-s=>s.src===playlist[newIdx].src
-);
-
-}else{
-
-let nextPos =
-(currentPos + 1) % playlist.length;
-
-/* extra guard for repeat off */
-if(
-repeat==="off" &&
-currentPos===playlist.length-1
-){
-pauseSong();
-return;
-}
-
-currentIndex =
-songs.findIndex(
-s=>s.src===playlist[nextPos].src
-);
-
-}
-
-loadSong();
-playSong();
-highlight();
-saveState();
-
+//Move while dragging
+document.addEventListener("mousemove", (e) => {
+  if (!STATE.isSeeking) return;
+  seek(e);
 });
 
-  menuBtn.onclick = (e) => {
-    e.stopImmediatePropagation();
-    menuPopup.style.display = (menuPopup.style.display === "flex") ? "none" : "flex";
+document.addEventListener("touchmove", (e) => {
+  if (!STATE.isSeeking) return;
+  seek(e);
+});
+
+//End dragging
+document.addEventListener("mouseup", () => {
+  STATE.isSeeking = false;
+});
+
+document.addEventListener("touchend", () => {
+  STATE.isSeeking = false;
+});
+
+//Prevent page scroll while dragging on mobile:
+DOM.bar.addEventListener("touchmove", (e) => {
+  if (STATE.isSeeking) e.preventDefault();
+}, { passive: false });
+
+//HIGHLIGHTING TRACKS
+function highlightActiveTrack() {
+
+  const current = document.querySelector(".song.active");
+  if (current) current.classList.remove("active");
+
+  const active = DOM.list.querySelector(
+    `.song[data-index="${STATE.currentIndex}"]`
+  );
+
+  if (active) {
+    active.classList.add("active");
+
+    requestAnimationFrame(() => {
+      active.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth"
+      });
+    });
+  }
+}
+
+
+function debounce(fn, delay = 200) {
+  let timer;
+
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+const handleSearch = debounce((value) => {
+  renderList(value);
+
+  // only scroll when search is empty
+  if (!value) {
+    setTimeout(() => {
+      highlightActiveTrack();
+    }, 50);
+  }
+}, 200);
+
+function getCurrentSong() {
+  return STATE.songs[STATE.currentIndex] || null;
+}
+
+// =======================
+// SWIPE GESTURES
+// =======================
+
+DOM.player.addEventListener("touchstart", (e) => {
+
+  STATE.isSwipeAllowed = !e.target.closest(
+    ".bar, #volume, button, input"
+  );
+
+  if (!STATE.isSwipeAllowed) return;
+
+  const touch = e.touches[0];
+
+  STATE.touchStartX = touch.clientX;
+  STATE.touchStartY = touch.clientY;
+  STATE.touchStartTime = Date.now();
+});
+
+DOM.player.addEventListener("touchend", (e) => {
+
+  if (!STATE.isSwipeAllowed || STATE.isSeeking) return;
+
+  const touch = e.changedTouches[0];
+
+  STATE.touchEndX = touch.clientX;
+  STATE.touchEndY = touch.clientY;
+
+  const timeTaken = Date.now() - STATE.touchStartTime;
+
+  handleSwipe(timeTaken);
+});
+
+function handleSwipe(timeTaken) {
+
+  const dx = STATE.touchEndX - STATE.touchStartX;
+  const dy = STATE.touchEndY - STATE.touchStartY;
+
+  const absX = Math.abs(dx);
+  const absY = Math.abs(dy);
+
+  // distance thresholds
+  const minDistance = 60;
+
+  // velocity (px per ms)
+  const velocityX = absX / timeTaken;
+  const velocityY = absY / timeTaken;
+
+  // fast swipe threshold
+  const fastSwipe = 0.4;
+
+  // ignore tiny movement
+  if (absX < 20 && absY < 20) return;
+
+  // HORIZONTAL
+  if (absX > absY) {
+
+    const isFast = velocityX > fastSwipe;
+
+    if (absX > minDistance || isFast) {
+
+      if (dx < 0) {
+        // LEFT → NEXT
+        const nextIndex = getNextIndex("next");
+
+        if (nextIndex !== null) {
+          STATE.currentIndex = nextIndex;
+          loadSong();
+          playSong();
+          highlightActiveTrack();
+          saveState();
+        }
+
+      } else {
+        // RIGHT → PREVIOUS
+        const prevIndex = getNextIndex("prev");
+
+        if (prevIndex !== null) {
+          STATE.currentIndex = prevIndex;
+          loadSong();
+          playSong();
+          highlightActiveTrack();
+          saveState();
+        }
+      }
+    }
+  }
+
+  // VERTICAL
+  else {
+
+    const isFast = velocityY > fastSwipe;
+
+    if (absY > minDistance || isFast) {
+
+      if (dy > 0) {
+        // DOWN → COLLAPSE
+        STATE.isMini = true;
+        DOM.player.classList.add("mini");
+           setTimeout(updateMarquee, 80);
+      } else {
+        // UP → EXPAND
+        STATE.isMini = false;
+        DOM.player.classList.remove("mini");
+          setTimeout(updateMarquee, 80);
+      }
+    }
+  }
+}
+
+
+
+
+
+// =======================
+// EVENTS
+// =======================
+
+DOM.playBtn.onclick = () => {
+  DOM.audio.paused ? playSong() : pauseSong();
+};
+
+//NEXT BUTTON 
+document.getElementById("next").onclick = () => {
+
+  const nextIndex = getNextIndex("next");
+
+  if (nextIndex === null) {
+    pauseSong();
+    return;
+  }
+
+  STATE.currentIndex = nextIndex;
+
+  loadSong();
+  playSong();
+  highlightActiveTrack();
+  saveState();
+};
+
+//PREVIOUS BUTTON  
+document.getElementById("prev").onclick = () => {
+
+  const prevIndex = getNextIndex("prev");
+
+  if (prevIndex === null) return;
+
+  STATE.currentIndex = prevIndex;
+
+  loadSong();
+  playSong();
+  highlightActiveTrack();
+  saveState();
+};
+
+DOM.clearBtn.onclick = () => {
+
+  DOM.search.value = "";
+
+  DOM.clearBtn.style.display = "none";
+
+  renderList("");
+
+setTimeout(() => {
+  highlightActiveTrack();
+}, 50);
+
+  DOM.search.focus();
+};
+
+DOM.audio.addEventListener("timeupdate", updateTime);
+
+//AUDIO
+DOM.audio.addEventListener("ended", function () {
+
+  const nextIndex = getNextIndex("next");
+
+  if (nextIndex === null) {
+    pauseSong();
+    DOM.audio.currentTime = 0;
+    return;
+  }
+
+  STATE.currentIndex = nextIndex;
+  highlightActiveTrack();
+
+  loadSong();
+  playSong();
+  saveState();
+});
+
+// MENU
+if (DOM.menuToggle && DOM.overlay && DOM.sideMenu) {
+
+  DOM.menuToggle.onclick = () => {
+    DOM.sideMenu.classList.add("open");
+    DOM.overlay.classList.add("show");
   };
 
-  menuPopup.onclick = (e) => e.stopPropagation();
-
-  document.addEventListener("click", () => menuPopup.style.display = "none");
-
-  audio.addEventListener("error", () => {
-    console.warn("Audio failed:", songs[currentIndex].title);
-  });
-  
-  // SERVICE WORKER AUTO RELOAD HANDLER
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    window.location.reload();
-  });
+  DOM.overlay.onclick = () => {
+    DOM.sideMenu.classList.remove("open");
+    DOM.overlay.classList.remove("show");
+  };
 }
+
+// SIDE MENU NAVIGATION 
+document.querySelectorAll(".menu-item").forEach(btn => {
+  btn.onclick = () => {
+
+    const view = btn.dataset.view;
+    STATE.view = view;
+
+    DOM.sideMenu.classList.remove("open");
+    DOM.overlay.classList.remove("show");
+
+    switchView(view);
+  };
+});
+
+
+// COLLAPSE PLAYER
+DOM.collapseBtn.onclick = () => {
+
+  STATE.isMini = !STATE.isMini;
+
+  DOM.player.classList.toggle("mini", STATE.isMini);
+
+  // re-measure title after layout change
+  setTimeout(updateMarquee, 80);
+};
+
+
+//TAB CLICK LOGIC 
+document.querySelectorAll(".tab-btn[data-playlist]").forEach(btn => {
+
+  btn.onclick = function(){
+
+    STATE.showFavoritesOnly = false;
+    STATE.activePlaylist = this.dataset.playlist.toLowerCase();
+
+    renderList(DOM.search.value);
+    updateActiveTab();
+  };
+
+});
+
+//FAVORITES TAB 
+DOM.tabFavorites.onclick = ()=>{
+  STATE.showFavoritesOnly = true;
+  renderList(DOM.search.value);
+  updateActiveTab();
+};
+
+//ACTIVE TAB HIGHLIGHT 
+function updateActiveTab(){
+
+  document.querySelectorAll(".tab-btn")
+    .forEach(btn => btn.classList.remove("active"));
+
+  if(STATE.showFavoritesOnly){
+    DOM.tabFavorites.classList.add("active");
+    return;
+  }
+
+  const btn = [...document.querySelectorAll(".tab-btn[data-playlist]")]
+    .find(b => b.dataset.playlist.toLowerCase() === STATE.activePlaylist);
+
+  if(btn) btn.classList.add("active");
+}
+
+//SHUFFLE 
+DOM.shuffleBtn.onclick = () => {
+
+  STATE.shuffle = !STATE.shuffle;
+
+  localStorage.setItem("shuffle", STATE.shuffle);
+
+  updateShuffleButton();
+};
+
+//REPEAT 
+DOM.repeatBtn.onclick = () => {
+
+  if (STATE.repeat === "off") {
+    STATE.repeat = "one";
+  }
+  else if (STATE.repeat === "one") {
+    STATE.repeat = "all";
+  }
+  else {
+    STATE.repeat = "off";
+  }
+
+  localStorage.setItem("repeat", STATE.repeat);
+
+  updateRepeatButton();
+};
+
+//VOLUME SLIDER
+DOM.volume.oninput = () => {
+
+  STATE.lastVolume = parseFloat(DOM.volume.value);
+  STATE.isMuted = STATE.lastVolume === 0;
+
+  localStorage.setItem("volume", STATE.lastVolume);
+  localStorage.setItem("muted", STATE.isMuted);
+
+  applyVolume();
+};
+
+//MUTE
+DOM.muteBtn.onclick = () => {
+
+  STATE.isMuted = !STATE.isMuted;
+
+  localStorage.setItem("muted", STATE.isMuted);
+
+  applyVolume();
+};
+
+
+DOM.search.oninput = (e) => {
+
+  const value = e.target.value;
+
+  DOM.clearBtn.style.display = value ? "flex" : "none";
+
+  handleSearch(value);
+};
+
+//PLAYER MENU
+DOM.menuBtn.onclick = (e) => {
+  e.stopPropagation();
+  DOM.menuPopup.style.display =
+    DOM.menuPopup.style.display === "flex" ? "none" : "flex";
+};
+
+// close when clicking outside
+document.addEventListener("click", () => {
+  DOM.menuPopup.style.display = "none";
+});
+
+// prevent closing when clicking inside menu
+DOM.menuPopup.onclick = (e) => {
+  e.stopPropagation();
+};
+
+// Menu Download 
+DOM.menuDownload.onclick = () => {
+
+  const song = getCurrentSong();
+  if (!song) return;
+
+  const link = document.createElement("a");
+  link.href = song.src;
+  link.download = song.title + ".mp3";
+
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  const downloads = JSON.parse(localStorage.getItem("downloads")) || [];
+
+  if (!downloads.includes(STATE.currentIndex)) {
+    downloads.push(STATE.currentIndex);
+    localStorage.setItem("downloads", JSON.stringify(downloads));
+  }
+
+  DOM.menuPopup.style.display = "none";
+};
+
+//Share
+DOM.menuShare.onclick = async () => {
+
+  const song = getCurrentSong();
+  if (!song) return;
+
+  const shareData = {
+    title: song.title,
+    text: "Listen to this track on AlatiphA Music",
+    url: song.src
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      await navigator.clipboard.writeText(song.src);
+      alert("Link copied to clipboard");
+    }
+  } catch (err) {
+    console.log("Share failed", err);
+  }
+
+  DOM.menuPopup.style.display = "none";
+};
+
+
+
+
+
+
+// =======================
+// INIT
+// =======================
+
+function init(){
 
   renderList();
-  loadSong();
-  highlight();
-  updateRepeatButton();
-  updateClearButton();
 
-checkForUpdate();
-setTimeout(checkForUpdate, 2000);
-setInterval(checkForUpdate, 60000);
+  loadSong();
+
+  // 🔥 Force UI sync AFTER everything is ready
+  setTimeout(() => {
+    highlightActiveTrack();
+    updateMarquee();
+  }, 50);
+
+  updateActiveTab();
+  updateShuffleButton();
+  updateRepeatButton();
+  applyVolume();
+  loadDurations();
+
+  DOM.clearBtn.style.display = "none";
+  
+  const wasPlaying = JSON.parse(localStorage.getItem("isPlaying"));
+
+if (wasPlaying) {
+  playSong();
+}
+}
 
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function () {
-    navigator.serviceWorker.register("./sw.js")
-      .then(reg => console.log("SW registered", reg.scope))
-      .catch(err => console.error("SW failed", err));
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "RELOAD") {
+      window.location.reload();
+    }
   });
 }
 
-// HAPTIC FEEDBACK (VIBRATION)
-try {
-  document.querySelectorAll(".controls button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (navigator.vibrate) navigator.vibrate(10);
-    });
-  });
-} catch (err) {
-  console.warn("Vibration not supported");
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch(console.error);
 }
 
-player.addEventListener("click", function(e){
-
-  if (hasMoved) return;
-  if (!isMini) return;
-
-  if (
-      e.target.closest("button") ||
-      e.target.closest("input") ||
-      e.target.tagName === "I"
-  ){
-      return;
-  }
-
-  isMini = false;
-  player.classList.remove("mini");
-
-  collapseBtn.innerHTML =
-    '<i class="fas fa-chevron-down"></i>';
-    
-});
-
-/* PLAYLIST TAB CLICK */
-document.querySelectorAll(".tab-btn[data-playlist]").forEach(btn=>{
-
-  btn.addEventListener("click",function(){
-
-    showFavoritesOnly = false;
-
-    activePlaylist = this.dataset.playlist.toLowerCase(); // 🔥 normalize here
-
-    updateActiveTab();
-    renderList(searchInput.value);
-
-  });
-
-});
-
-// TOUCH
-player.addEventListener("touchstart", e => {
-  if (e.target.closest("button") || e.target.closest("input")) return;
-  startDrag(e.touches[0].clientY);
-});
-
-player.addEventListener("touchend", endDrag);
-
-player.addEventListener(
- "touchmove",
- e => moveDrag(e.touches[0].clientY),
- {passive:true}
-);
-
-// MOUSE (desktop testing)
-player.addEventListener("mousedown", e => {
-  if (e.target.closest("button") || e.target.closest("input")) return;
-  startDrag(e.clientY);
-});
-
-window.addEventListener("mousemove", e => {
-  moveDrag(e.clientY);
-});
-
-window.addEventListener("mouseup", endDrag);
-
-list.addEventListener(
-"scroll",
-function(){
-
-let newStart=
-Math.floor(
-list.scrollTop/
-ROW_HEIGHT
-);
-
-if(
-newStart!==startIndex
-){
-
-startIndex=newStart;
-
-renderList(
-searchInput.value
-);
-
-}
-
-}
-);
-
-  /* Register service worker */
-if("serviceWorker" in navigator){
-window.addEventListener(
-"load",
-function(){
-
-navigator.serviceWorker.register("./sw.js")
-.then(function(reg){
-console.log(
-"Service Worker registered",
-reg.scope
-);
-})
-.catch(function(err){
-console.error(
-"SW registration failed",
-err
-);
-});
-
-}
-);
-}
+init();
 
 })();
 </script>
