@@ -1,4 +1,4 @@
-const CACHE_NAME = "alatipha-music-v4";
+const CACHE_NAME = "alatipha-music-v5";
 const SONG_CACHE = "alatipha-songs-v1";
 
 /* APP SHELL */
@@ -8,12 +8,7 @@ const ASSETS = [
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-
-  "./css/all.min.css",
-
-  "./webfonts/fa-solid-900.woff2",
-  "./webfonts/fa-regular-400.woff2",
-  "./webfonts/fa-brands-400.woff2"
+  "./css/all.min.css"
 ];
 
 /* INSTALL */
@@ -27,7 +22,7 @@ self.addEventListener("install", (event) => {
   );
 });
 
-/* ACTIVATE + CLEAN OLD CACHE + FORCE RELOAD */
+/* ACTIVATE */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
@@ -44,7 +39,7 @@ self.addEventListener("activate", (event) => {
 
       await self.clients.claim();
 
-      /* FORCE ALL OPEN TABS TO RELOAD */
+      // Force reload all open tabs
       const clientsList = await self.clients.matchAll();
       clientsList.forEach(client => {
         client.postMessage({ type: "RELOAD" });
@@ -59,28 +54,46 @@ self.addEventListener("fetch", (event) => {
 
   const request = event.request;
 
-  /* 1. MP3 FILES (ðŸ”¥ FIXED: CACHE FIRST) */
+  /* 1. AUDIO FILES (CACHE FIRST) */
   if (request.url.includes(".mp3")) {
     event.respondWith(cacheAudioFirst(request));
     return;
   }
 
-  /* 2. HTML (NETWORK FIRST) */
-  if (request.mode === "navigate") {
-  event.respondWith(
-    fetch(request, { cache: "no-store" })
-      .then((response) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, response.clone());
-          return response;
-        });
+  /* 2. FONTS (VERY IMPORTANT FIX FOR FONT AWESOME) */
+  if (request.destination === "font") {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        return (
+          cached ||
+          fetch(request).then((response) => {
+            return caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, response.clone());
+              return response;
+            });
+          })
+        );
       })
-      .catch(() => caches.match("./index.html"))
-  );
-  return;
-}
+    );
+    return;
+  }
 
-  /* 3. OTHER ASSETS (STALE-WHILE-REVALIDATE) */
+  /* 3. HTML NAVIGATION (NETWORK FIRST) */
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request, { cache: "no-store" })
+        .then((response) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, response.clone());
+            return response;
+          });
+        })
+        .catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
+  /* 4. OTHER ASSETS (STALE-WHILE-REVALIDATE) */
   event.respondWith(
     caches.match(request).then((cached) => {
 
@@ -100,12 +113,11 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-/* ðŸ”¥ AUDIO CACHE FUNCTION (NEW CORE FIX) */
+/* AUDIO CACHE */
 async function cacheAudioFirst(request) {
 
   const cache = await caches.open(SONG_CACHE);
 
-  /* RETURN CACHED VERSION INSTANTLY */
   const cached = await cache.match(request);
   if (cached) return cached;
 
@@ -113,7 +125,6 @@ async function cacheAudioFirst(request) {
 
     const response = await fetch(request);
 
-    /* STORE FOR OFFLINE */
     cache.put(request, response.clone());
 
     return response;
@@ -123,11 +134,10 @@ async function cacheAudioFirst(request) {
     return new Response("Audio not available offline", {
       status: 404
     });
-
   }
 }
 
-/* OPTIONAL: MANUAL SKIP WAITING */
+/* MANUAL UPDATE CONTROL */
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
     self.skipWaiting();
