@@ -1,4 +1,4 @@
-const CACHE_NAME = "alatipha-music-v4";
+const CACHE_NAME = "alatipha-music-v3";
 const SONG_CACHE = "alatipha-songs-v1";
 
 /* APP SHELL */
@@ -8,13 +8,9 @@ const ASSETS = [
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
-
-  "./css/all.min.css",
-
-  "./webfonts/fa-solid-900.woff2",
-  "./webfonts/fa-regular-400.woff2",
-  "./webfonts/fa-brands-400.woff2"
+  "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
 ];
+
 
 /* INSTALL */
 self.addEventListener("install", (event) => {
