@@ -123,7 +123,7 @@ Favorites
       <button id="collapse-btn"><i class="fas fa-chevron-down"></i></button>
   </div>
 
-  <div id="menu" class="menu-popup">
+    <div id="menu" class="menu-popup">
     <button id="menu-download"><i class="fas fa-download"></i> Download</button>
     <button id="menu-share"><i class="fas fa-share-alt"></i> Share</button>
   </div>
@@ -444,6 +444,7 @@ Favorites
   bottom: 0;
   left: 0;
   width: 100%;
+  isolation: isolate;
   background: var(--player-bg);
   backdrop-filter: blur(22px);
   border-top: 1px solid var(--border);
@@ -458,7 +459,7 @@ Favorites
   transition: height 0.3s ease, transform 0.3s ease;
   will-change: transform;
   touch-action: pan-y;
-  overflow: hidden;
+  overflow: visible;
   cursor: grab;
 }
 
@@ -676,20 +677,27 @@ box-shadow:
   }
 
   /* MENU */
-  .menu-popup {
-    position: absolute;
-    bottom: 80px;
-    right: 20px;
-    background: var(--player-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px 0;
-    box-shadow: 0 10px 30px var(--shadow);
-    display: none;
-    flex-direction: column;
-    z-index: 1100;
-    min-width: 170px;
-  }
+  /* MENU */
+.menu-popup {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+
+  background: var(--player-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px 0;
+
+  box-shadow: 0 10px 30px var(--shadow);
+
+  display: none;
+  flex-direction: column;
+
+  z-index: 999999;
+  min-width: 170px;
+
+  overflow: visible;
+}
 
   .menu-popup button {
     padding: 12px 20px;
@@ -720,6 +728,7 @@ box-shadow:
   padding: 8px 12px;
   flex-direction: row;
   align-items: center;
+  overflow: visible;
 }
 
 /* shrink cover */
@@ -1474,22 +1483,51 @@ async function loadSong() {
 }
 
 
-function playSong(){
-  DOM.audio.play().then(()=>{
-    DOM.playBtn.innerHTML = '<i class="fas fa-pause"></i>';
-    DOM.playBtn.classList.add("pause");
-    DOM.cover.classList.add("playing");
-    setTimeout(preloadNextTrack, 200);
-    savePlaybackState(true);
-  });
+function playSong() {
+
+  DOM.audio.play()
+
+    .then(() => {
+
+      DOM.playBtn.innerHTML =
+        '<i class="fas fa-pause"></i>';
+
+      DOM.playBtn.classList.add("pause");
+
+      DOM.cover.classList.add("playing");
+
+      setTimeout(preloadNextTrack, 200);
+
+      savePlaybackState(true);
+    })
+
+    .catch(err => {
+
+      console.error("Playback failed", err);
+
+      DOM.playBtn.innerHTML =
+        '<i class="fas fa-play"></i>';
+
+      DOM.playBtn.classList.remove("pause");
+
+      DOM.cover.classList.remove("playing");
+
+      savePlaybackState(false);
+    });
 }
 
 function pauseSong(){
+
   DOM.audio.pause();
-  DOM.playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  DOM.playBtn.classList.remove("pause");
-  DOM.cover.classList.remove("playing");
+
   savePlaybackState(false);
+
+  DOM.playBtn.innerHTML =
+    '<i class="fas fa-play"></i>';
+
+  DOM.playBtn.classList.remove("pause");
+
+  DOM.cover.classList.remove("playing");
 }
 
 function nextSong(){
@@ -1927,7 +1965,7 @@ function showAbout() {
     <div style="padding:15px; line-height:1.6;">
       <h3>AlatiphA Music</h3>
       <p>With AlatiphA, it’s easy to listen to tailored online and offline music on your phone, your computer, your tablet and more.</p>
-      <p>Version: v6</p>
+      <p>Version: v7</p>
     </div>
   `;
 }
@@ -2202,29 +2240,26 @@ function handleSwipe(timeTaken) {
     if (absX > minDistance || isFast) {
 
       if (dx < 0) {
-        // LEFT → NEXT
-        const nextIndex = getNextIndex("next");
 
-        if (nextIndex !== null) {
-          STATE.currentIndex = nextIndex;
-          loadSong();
-          playSong();
-          highlightActiveTrack();
-          saveState();
-        }
+  const nextIndex = getNextIndex("next");
 
-      } else {
-        // RIGHT → PREVIOUS
-        const prevIndex = getNextIndex("prev");
+  if (nextIndex === null) return;
 
-        if (prevIndex !== null) {
-          STATE.currentIndex = prevIndex;
-          loadSong();
-          playSong();
-          highlightActiveTrack();
-          saveState();
-        }
-      }
+  STATE.currentIndex = nextIndex;
+
+} else {
+
+  const prevIndex = getNextIndex("prev");
+
+  if (prevIndex === null) return;
+
+  STATE.currentIndex = prevIndex;
+}
+
+saveState();
+loadSong();
+playSong();
+highlightActiveTrack();     
     }
   }
 
@@ -2518,9 +2553,21 @@ DOM.search.oninput = (e) => {
 
 //PLAYER MENU
 DOM.menuBtn.onclick = (e) => {
+
   e.stopPropagation();
+
+  const rect = DOM.menuBtn.getBoundingClientRect();
+
+  DOM.menuPopup.style.right =
+    (window.innerWidth - rect.right) + "px";
+
+  DOM.menuPopup.style.bottom =
+    (window.innerHeight - rect.top + 10) + "px";
+
   DOM.menuPopup.style.display =
-    DOM.menuPopup.style.display === "flex" ? "none" : "flex";
+    DOM.menuPopup.style.display === "flex"
+      ? "none"
+      : "flex";
 };
 
 // close when clicking outside
@@ -2560,7 +2607,10 @@ DOM.menuDownload.onclick = async () => {
     }
 
     // FETCH SONG
-    const response = await fetch(song.src);
+    const response = await fetch(song.src, {
+    cache: "no-store",
+    mode: "cors"
+  });
 
     if (!response.ok) {
       throw new Error("Download failed");
@@ -2672,15 +2722,36 @@ if (wasPlaying) {
 }
 
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data && event.data.type === "RELOAD") {
-      window.location.reload();
-    }
-  });
-}
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js").catch(console.error);
+  navigator.serviceWorker.register("./sw.js")
+    .then((registration) => {
+
+      console.log("Service Worker registered");
+
+      // force update check
+      registration.update();
+
+      navigator.serviceWorker.addEventListener(
+        "message",
+        (event) => {
+
+          if (
+            event.data &&
+            event.data.type === "RELOAD"
+          ) {
+
+            window.location.reload();
+          }
+        }
+      );
+    })
+
+    .catch((err) => {
+      console.error(
+        "Service Worker registration failed",
+        err
+      );
+    });
 }
 
 init();
