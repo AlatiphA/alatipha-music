@@ -1,4 +1,4 @@
-const CACHE_NAME = "alatipha-music-v6";
+const CACHE_NAME = "alatipha-music-v7";
 const SONG_CACHE = "alatipha-songs-v1";
 
 /* APP SHELL */
@@ -13,6 +13,7 @@ const ASSETS = [
 
 /* INSTALL */
 self.addEventListener("install", (event) => {
+
   self.skipWaiting();
 
   event.waitUntil(
@@ -24,6 +25,7 @@ self.addEventListener("install", (event) => {
 
 /* ACTIVATE */
 self.addEventListener("activate", (event) => {
+
   event.waitUntil(
     (async () => {
 
@@ -31,7 +33,11 @@ self.addEventListener("activate", (event) => {
 
       await Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME && key !== SONG_CACHE) {
+
+          if (
+            key !== CACHE_NAME &&
+            key !== SONG_CACHE
+          ) {
             return caches.delete(key);
           }
         })
@@ -39,10 +45,14 @@ self.addEventListener("activate", (event) => {
 
       await self.clients.claim();
 
-      // Force reload all open tabs
-      const clientsList = await self.clients.matchAll();
-      clientsList.forEach(client => {
-        client.postMessage({ type: "RELOAD" });
+      // Reload all tabs
+      const clientsList =
+        await self.clients.matchAll();
+
+      clientsList.forEach((client) => {
+        client.postMessage({
+          type: "RELOAD"
+        });
       });
 
     })()
@@ -54,92 +64,170 @@ self.addEventListener("fetch", (event) => {
 
   const request = event.request;
 
-  /* 1. AUDIO FILES (CACHE FIRST) */
-  if (request.url.includes(".mp3")) {
-    event.respondWith(cacheAudioFirst(request));
+  /* 1. AUDIO STREAMS ONLY */
+  if (
+    request.destination === "audio" &&
+    request.method === "GET"
+  ) {
+
+    event.respondWith(
+      cacheAudioFirst(request)
+    );
+
     return;
   }
 
-  /* 2. FONTS (VERY IMPORTANT FIX FOR FONT AWESOME) */
+  /* 2. FONTS */
   if (request.destination === "font") {
+
     event.respondWith(
+
       caches.match(request).then((cached) => {
+
         return (
           cached ||
+
           fetch(request).then((response) => {
-            return caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, response.clone());
-              return response;
-            });
+
+            return caches.open(CACHE_NAME)
+              .then((cache) => {
+
+                cache.put(
+                  request,
+                  response.clone()
+                );
+
+                return response;
+              });
           })
         );
       })
     );
+
     return;
   }
 
-  /* 3. HTML NAVIGATION (NETWORK FIRST) */
+  /* 3. HTML NAVIGATION */
   if (request.mode === "navigate") {
+
     event.respondWith(
-      fetch(request, { cache: "no-store" })
-        .then((response) => {
-          return caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, response.clone());
+
+      fetch(request, {
+        cache: "no-store"
+      })
+
+      .then((response) => {
+
+        return caches.open(CACHE_NAME)
+          .then((cache) => {
+
+            cache.put(
+              request,
+              response.clone()
+            );
+
             return response;
           });
-        })
-        .catch(() => caches.match("./index.html"))
+      })
+
+      .catch(() => {
+        return caches.match("./index.html");
+      })
     );
+
     return;
   }
 
-  /* 4. OTHER ASSETS (STALE-WHILE-REVALIDATE) */
+  /* 4. OTHER ASSETS */
   event.respondWith(
+
     caches.match(request).then((cached) => {
 
       const fetchPromise = fetch(request)
+
         .then((networkResponse) => {
 
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, networkResponse.clone());
-          });
+          // cache only valid same-origin files
+          if (
+            networkResponse &&
+            networkResponse.status === 200 &&
+            networkResponse.type === "basic"
+          ) {
+
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+
+                cache.put(
+                  request,
+                  networkResponse.clone()
+                );
+              });
+          }
 
           return networkResponse;
         })
-        .catch(() => cached);
+
+        .catch(() => {
+          return cached;
+        });
 
       return cached || fetchPromise;
     })
   );
-});
+
+}); // IMPORTANT: closes fetch listener
 
 /* AUDIO CACHE */
 async function cacheAudioFirst(request) {
 
-  const cache = await caches.open(SONG_CACHE);
+  const cache =
+    await caches.open(SONG_CACHE);
 
-  const cached = await cache.match(request);
-  if (cached) return cached;
+  const cached =
+    await cache.match(request);
+
+  if (cached) {
+    return cached;
+  }
 
   try {
 
-    const response = await fetch(request);
+    const response =
+      await fetch(request);
 
-    cache.put(request, response.clone());
+    // only cache successful audio
+    if (
+      response &&
+      response.status === 200
+    ) {
+
+      await cache.put(
+        request,
+        response.clone()
+      );
+    }
 
     return response;
 
   } catch (err) {
 
-    return new Response("Audio not available offline", {
-      status: 404
-    });
+    return new Response(
+      "Audio not available offline",
+      {
+        status: 404
+      }
+    );
   }
 }
 
 /* MANUAL UPDATE CONTROL */
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
+
+  if (
+    event.data &&
+    event.data.type === "SKIP_WAITING"
+  ) {
+
     self.skipWaiting();
   }
 });
