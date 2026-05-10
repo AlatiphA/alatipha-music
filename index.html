@@ -1965,7 +1965,7 @@ function showAbout() {
     <div style="padding:15px; line-height:1.6;">
       <h3>AlatiphA Music</h3>
       <p>With AlatiphA, it’s easy to listen to tailored online and offline music on your phone, your computer, your tablet and more.</p>
-      <p>Version: v8</p>
+      <p>Version: v9</p>
     </div>
   `;
 }
@@ -2582,6 +2582,7 @@ DOM.menuPopup.onclick = (e) => {
 
 // Menu Download 
 // MENU DOWNLOAD
+// MENU DOWNLOAD
 DOM.menuDownload.onclick = async () => {
 
   try {
@@ -2607,10 +2608,7 @@ DOM.menuDownload.onclick = async () => {
     }
 
     // FETCH SONG
-    const response = await fetch(song.src, {
-    cache: "no-store",
-    mode: "cors"
-  });
+    const response = await fetch(song.src);
 
     if (!response.ok) {
       throw new Error("Download failed");
@@ -2629,13 +2627,17 @@ DOM.menuDownload.onclick = async () => {
       downloadedAt: Date.now()
     });
 
-await loadDownloadedSongsMap();
+    // REFRESH MEMORY MAP
+    await loadDownloadedSongsMap();
 
-alert("Song downloaded for offline use");
+    alert("Song downloaded for offline use");
 
-if (STATE.view === "downloads") {
-  renderDownloads();
-}
+    // refresh UI
+    renderList(DOM.search.value);
+
+    if (STATE.view === "downloads") {
+      renderDownloads();
+    }
 
   } catch (err) {
 
