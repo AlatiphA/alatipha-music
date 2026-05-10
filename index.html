@@ -7,7 +7,8 @@ content="width=device-width, initial-scale=1.0">
 
 <title>AlatiphA Music</title>
 
-<link rel="stylesheet" href="./css/all.min.css">
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"/>
 
 <!-- Android -->
 <link rel="manifest" href="manifest.json">
@@ -72,7 +73,7 @@ Rap
 </button>
 
 <button class="tab-btn"
-data-playlist="RnB">
+data-playlist="rnb">
 R&B
 </button>
 
@@ -418,10 +419,24 @@ Favorites
   }
 
   .song.active {
-    background: linear-gradient(90deg, var(--accent), var(--accent-light)) !important;
-    color: white !important;
-    border-color: transparent;
-  }
+  background: linear-gradient(90deg, var(--accent), var(--accent-light)) !important;
+  color: white !important;
+  border-color: transparent;
+}
+
+/*Adds border to downloaded songs*/
+/*
+.song.downloaded {
+  border-color: var(--accent);
+}
+*/
+
+.song.downloaded::after {
+  content: "⬇";
+  margin-left: auto;
+  font-size: 12px;
+  opacity: 0.8;
+}
 
   /* PLAYER */
 .player {
@@ -521,12 +536,6 @@ box-shadow:
 }
 
 /* animation */
-#title.marquee span{
-  animation-name: playerTicker;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
 #title.marquee span {
   animation-name: playerTicker;
   animation-timing-function: linear;
@@ -840,7 +849,7 @@ const songs = [
 }, 
         
 { 
-   title: "LGBTQ not Priority - AlatiphA", 
+   title: "LGBTQ not a Priority - AlatiphA", 
    src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/LGBTQ%20%20Not%20a%20Priority%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
@@ -864,7 +873,7 @@ const songs = [
 },
 
 {
-   title: "Stand or fall - AlatiphA ", 
+   title: "Stand or Fall - AlatiphA", 
    src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Stand%20or%20fall%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
@@ -923,7 +932,7 @@ const songs = [
 },
 
 {
-   title: "Rap Lyric Tribute:“ Shield and Pillar - AlatiphA", 
+   title: 'Rap Lyric Tribute: "Shield and Pillar" - AlatiphA', 
    src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Rap%20Lyric%20Tribute%20%E2%80%93%20_Shield%20and%20Pillar_%28From%20Black%20Maria%20to%20their%20Commander%29%20-%20AlatiphA%20AI%28MP3_160K%29.mp3", 
    tags: ["rap"]
 },
@@ -936,7 +945,7 @@ const songs = [
 
 { 
    title: "No Be Pawn (Remix) - AlatiphA", 
-   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/Yawa%20Season%20-%20AlatiphA%28MP3_160K%29.mp3", 
+   src: "https://archive.org/download/no-be-pawn-remix-alatiph-a-mp-3-160-k/No%20Be%20Pawn%20%28Remix%29%20-%20AlatiphA%28MP3_160K%29.mp3", 
    tags: ["rap", "remix"]
 },
 
@@ -998,6 +1007,66 @@ const songs = [
    title: "Aku Deception (Rap) - AlatiphA", 
    src: "https://archive.org/download/wins-only-reset-on-course-rap-alatiph-a/Aku%20Deception%20%28Rap%29%20-%20AlatiphA.mp3", 
    tags: ["rap", "recentlyadded"]
+}, 
+
+{ 
+   title: "1 Job_ 3 Shifts... Now Hustle - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/1%20Job_%203%20Shifts...%20Now%20Hustle%28MP3_160K%29.mp3", 
+   tags: ["rap", "recentlyadded"]
+},
+
+{ 
+   title: "Weatherproof Lies (Remix) - AlatiphA", 
+   src: "https://archive.org/download/too-big-for-their-games-alatiph-a-ai-mp-3-160-k/Weatherproof%20Lies%20%28Remix%29%20-%20AlatiphA%20AI.mp3", 
+   tags: ["remix", "recentlyadded"]
+},
+
+{ 
+   title: "Today is yours, Mama (Afrobeat) - AlatiphA", 
+   src: "https://archive.org/download/today-is-yours-mama-remix-alatiph-a/Today%20is%20yours%2C%20Mama%20%28Afrobeat%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "afrobeats", "recentlyadded"]
+},
+
+{ 
+   title: "Today is yours, Mama (R&B) - AlatiphA", 
+   src: "https://archive.org/download/today-is-yours-mama-remix-alatiph-a/Today%20is%20yours%2C%20Mama%20%28R%26B%29%20-%20AlatiphA.mp3", 
+   tags: ["rnb", "recentlyadded"]
+},
+
+{ 
+   title: "Today is yours, Mama (Remix) - AlatiphA", 
+   src: "https://archive.org/download/today-is-yours-mama-remix-alatiph-a/Today%20is%20yours%2C%20Mama%20%28Remix%29%20-%20AlatiphA.mp3", 
+   tags: ["remix", "recentlyadded"]
+},
+
+{ 
+   title: "Beyond the headlines (Nyaba Diaries) - AlatiphA", 
+   src: "https://archive.org/download/beyond-the-headlines-nyaba-diaries-alatiph-a/Beyond%20the%20headlines%20%28Nyaba%20Diaries%29%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
+},
+
+{ 
+   title: "Defending Chains - AlatiphA", 
+   src: "https://archive.org/download/beyond-the-headlines-nyaba-diaries-alatiph-a/Defending%20Chains%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
+},
+
+{ 
+   title: "No Fear Law - AlatiphA", 
+   src: "https://archive.org/download/beyond-the-headlines-nyaba-diaries-alatiph-a/No%20Fear%20Law%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
+},
+
+{ 
+   title: "Built on Pillars - AlatiphA", 
+   src: "https://archive.org/download/built-on-pillars-alatiph-a/Built%20on%20Pillars%20-%20AlatiphA.mp3", 
+   tags: ["rap", "recentlyadded"]
+},
+
+{ 
+   title: "Built on Pillars (Remix) - AlatiphA", 
+   src: "https://archive.org/download/built-on-pillars-alatiph-a/Built%20on%20Pillars%20%28Remix%29%20-%20AlatiphA.mp3", 
+   tags: ["remix", "recentlyadded"]
 }
   ];
 
@@ -1007,6 +1076,10 @@ const songs = [
 // =======================
 const STATE = {
   songs: songs,
+  
+  db: null,
+  downloadedSongs: {}, 
+
   currentIndex: (() => {
   const i = parseInt(localStorage.getItem("index"));
   return isNaN(i) ? 0 : i;
@@ -1026,7 +1099,7 @@ lastVolume: parseFloat(localStorage.getItem("volume")) || 1,
   isSwipeAllowed: false,
   durations: {}, 
   renderTimer: null, 
-  nextBufferAudio: new Audio(), 
+  nextBufferAudio: new Audio()
 };
 
 const DURATION_KEY = "alatipha_durations_v2";
@@ -1148,6 +1221,193 @@ function saveDurations() {
 
 
 // =======================
+// INDEXED DB
+// =======================
+
+const DB = {
+  name: "AlatiphAMusicDB",
+  version: 1,
+  database: null
+};
+
+// OPEN DATABASE
+function openDatabase() {
+
+  return new Promise((resolve, reject) => {
+
+    const request = indexedDB.open(
+      DB.name,
+      DB.version
+    );
+
+    // CREATE TABLES
+    request.onupgradeneeded = function (event) {
+
+      const db = event.target.result;
+
+      // SONG STORAGE
+      if (!db.objectStoreNames.contains("songs")) {
+
+        const store = db.createObjectStore(
+          "songs",
+          { keyPath: "id" }
+        );
+
+        store.createIndex(
+          "title",
+          "title",
+          { unique: false }
+        );
+      }
+    };
+
+    // SUCCESS
+    request.onsuccess = function (event) {
+
+      DB.database = event.target.result;
+
+      console.log("IndexedDB ready");
+
+      resolve(DB.database);
+    };
+
+    // ERROR
+    request.onerror = function (event) {
+
+      console.error(
+        "IndexedDB failed",
+        event.target.error
+      );
+
+      reject(event.target.error);
+    };
+  });
+}
+
+
+  // SAVE SONG
+function saveSongToDB(songData) {
+
+  return new Promise((resolve, reject) => {
+
+    try {
+
+      const transaction = DB.database.transaction(
+        ["songs"],
+        "readwrite"
+      );
+
+      const store = transaction.objectStore("songs");
+
+      const request = store.put(songData);
+
+      request.onsuccess = () => {
+        resolve(true);
+      };
+
+      request.onerror = (event) => {
+
+        console.error(
+          "Failed to save song",
+          event.target.error
+        );
+
+        reject(event.target.error);
+      };
+
+    } catch (err) {
+
+      console.error(err);
+
+      reject(err);
+    }
+  });
+}
+
+// GET SONG
+function getSongFromDB(id) {
+
+  return new Promise((resolve, reject) => {
+
+    try {
+
+      const transaction = DB.database.transaction(
+        ["songs"],
+        "readonly"
+      );
+
+      const store = transaction.objectStore("songs");
+
+      const request = store.get(id);
+
+      request.onsuccess = () => {
+        resolve(request.result || null);
+      };
+
+      request.onerror = (event) => {
+
+        console.error(
+          "Failed to get song",
+          event.target.error
+        );
+
+        reject(event.target.error);
+      };
+
+    } catch (err) {
+
+      console.error(err);
+
+      reject(err);
+    }
+  });
+}
+
+// GET ALL DOWNLOADED SONGS
+function getAllDownloadedSongs() {
+
+  return new Promise((resolve, reject) => {
+
+    try {
+
+      const transaction = DB.database.transaction(
+        ["songs"],
+        "readonly"
+      );
+
+      const store = transaction.objectStore("songs");
+
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        resolve(request.result || []);
+      };
+
+      request.onerror = (event) => {
+
+        console.error(
+          "Failed to load downloads",
+          event.target.error
+        );
+
+        reject(event.target.error);
+      };
+
+    } catch (err) {
+
+      console.error(err);
+
+      reject(err);
+    }
+  });
+}
+  
+  
+
+
+
+
+// =======================
 // LOGIC
 // =======================
 
@@ -1162,30 +1422,57 @@ function scheduleRender() {
 }
 
 
-function loadSong(){
+async function loadSong() {
+
   const song = STATE.songs[STATE.currentIndex];
-  if(!song) return;
+  if (!song) return;
 
-  DOM.audio.src = song.src;
-  DOM.cover.src = song.cover || COVER || "";
+  try {
+
+    let src = song.src;
+
+    // USE DOWNLOADED BLOB IF AVAILABLE
+    if (STATE.downloadedSongs[song.src]) {
+
+      src = URL.createObjectURL(
+        STATE.downloadedSongs[song.src].blob
+      );
+    }
+
+    DOM.audio.src = src;
+
+    DOM.cover.src = song.cover || COVER || "";
+
     if (!DOM.cover.src) {
-  DOM.cover.src = COVER;
+      DOM.cover.src = COVER;
+    }
+
+    DOM.title.innerHTML =
+      `<span data-title="${song.title}">
+        ${song.title}
+      </span>`;
+
+    DOM.cover.classList.add("loading");
+
+    DOM.audio.addEventListener("canplay", () => {
+      DOM.cover.classList.remove("loading");
+    }, { once: true });
+
+    updateMarquee();
+
+    DOM.playBtn.innerHTML =
+      '<i class="fas fa-play"></i>';
+
+    DOM.playBtn.classList.remove("pause");
+
+    highlightActiveTrack();
+
+  } catch (err) {
+
+    console.error("loadSong failed", err);
+  }
 }
 
-  DOM.title.innerHTML =
-    `<span data-title="${song.title}">${song.title}</span>`;
-    
-  DOM.cover.classList.add("loading");
-
-  DOM.audio.addEventListener("canplay", () => {
-  DOM.cover.classList.remove("loading");
-}, { once: true });
-
-  updateMarquee();
-
-  DOM.playBtn.innerHTML = '<i class="fas fa-play"></i>';
-  DOM.playBtn.classList.remove("pause");
-}
 
 function playSong(){
   DOM.audio.play().then(()=>{
@@ -1294,6 +1581,11 @@ if (hasFilter && !isMatch && !isCurrent) return;
 
     const div = document.createElement("div");
     div.className = "song";
+    
+    if (isDownloaded(i)) {
+  div.classList.add("downloaded");
+}
+
     div.dataset.index = i;
 
     const isFav = STATE.favorites.includes(i);
@@ -1418,7 +1710,14 @@ function updateTime(){
 
 function formatTime(s) {
 
-  if (!s || isNaN(s) || !isFinite(s)) return "--:--";
+  if (
+    s === undefined ||
+    s === null ||
+    isNaN(s) ||
+    !isFinite(s)
+  ) {
+    return "0:00";
+  }
 
   const m = Math.floor(s / 60);
   const sec = Math.floor(s % 60);
@@ -1447,12 +1746,23 @@ function getPlaylistByTag(tag){
 
 function getCurrentPlaylist(){
 
-  if(STATE.showFavoritesOnly){
+  // DOWNLOADS VIEW
+  if (STATE.view === "downloads") {
+
+    return STATE.songs
+      .map((song, index) => ({ song, index }))
+      .filter(item => isDownloaded(item.index));
+  }
+
+  // FAVORITES VIEW
+  if (STATE.showFavoritesOnly){
+
     return STATE.songs
       .map((song,index)=>({song,index}))
       .filter(item => STATE.favorites.includes(item.index));
   }
 
+  // NORMAL PLAYLISTS
   return getPlaylistByTag(STATE.activePlaylist);
 }
 
@@ -1466,22 +1776,38 @@ function resetUIState() {
 // SWITCH VIEW 
 function switchView(view) {
 
+  STATE.view = view;
+
+  resetUIState();
+
+  // RESET FAVORITES MODE
+  STATE.showFavoritesOnly = false;
+
   if (view === "home") {
-    STATE.showFavoritesOnly = false;
+
     STATE.activePlaylist = "all";
-    renderList(DOM.search.value);
+
+    renderList();
+
+    setTimeout(highlightActiveTrack, 50);
   }
 
-  if (view === "favorites") {
+  else if (view === "favorites") {
+
     STATE.showFavoritesOnly = true;
-    renderList(DOM.search.value);
+
+    renderList();
+
+    setTimeout(highlightActiveTrack, 50);
   }
 
-  if (view === "downloads") {
+  else if (view === "downloads") {
+
     renderDownloads();
   }
 
-  if (view === "about") {
+  else if (view === "about") {
+
     showAbout();
   }
 
@@ -1489,34 +1815,110 @@ function switchView(view) {
 }
 
 
-function renderDownloads() {
+async function renderDownloads() {
 
-  const downloaded = JSON.parse(localStorage.getItem("downloads")) || [];
+  DOM.list.innerHTML =
+    `<div style="padding:15px;">
+      Loading downloads...
+    </div>`;
 
-  DOM.list.innerHTML = "";
+  try {
 
-  downloaded.forEach(index => {
+    const downloads = await getAllDownloadedSongs();
 
-    const song = STATE.songs[index];
-    if (!song) return;
+    DOM.list.innerHTML = "";
 
-    const div = document.createElement("div");
-    div.className = "song";
+    if (!downloads.length) {
 
-    div.innerHTML = `
-      <img src="${song.cover || COVER}">
-      <span>${song.title}</span>
-    `;
+      DOM.list.innerHTML =
+        `<div style="padding:15px;">
+          No downloaded songs yet
+        </div>`;
 
-    div.onclick = () => {
-      STATE.currentIndex = index;
-      loadSong();
-      playSong();
-      saveState();
-    };
+      return;
+    }
 
-    DOM.list.appendChild(div);
-  });
+    STATE.songs.forEach((song, originalIndex) => {
+
+  const download =
+    STATE.downloadedSongs[song.src];
+
+  if (!download) return;
+
+      const div = document.createElement("div");
+
+      div.className = "song";
+      div.dataset.index = originalIndex;
+
+      const isFav =
+        STATE.favorites.includes(originalIndex);
+
+      div.innerHTML = `
+        <img src="${song.cover || COVER}">
+
+        <span>${song.title}</span>
+
+        <div class="song-right">
+
+          <button class="heart ${isFav ? "liked" : ""}">
+            <i class="${isFav ? "fas" : "far"} fa-heart"></i>
+          </button>
+
+        </div>
+      `;
+
+      // PLAY
+      div.onclick = (e) => {
+
+  if (e.target.closest(".heart")) return;
+
+  STATE.currentIndex = originalIndex;
+
+  loadSong();
+  playSong();
+  highlightActiveTrack();
+  saveState();
+};
+
+      // FAVORITE
+      div.querySelector(".heart").onclick = (e) => {
+
+        e.stopPropagation();
+
+        if (STATE.favorites.includes(originalIndex)) {
+
+          STATE.favorites =
+            STATE.favorites.filter(
+              x => x !== originalIndex
+            );
+
+        } else {
+
+          STATE.favorites.push(originalIndex);
+        }
+
+        localStorage.setItem(
+          "favorites",
+          JSON.stringify(STATE.favorites)
+        );
+
+        renderDownloads();
+      };
+
+      DOM.list.appendChild(div);
+    });
+
+    highlightActiveTrack();
+
+  } catch (err) {
+
+    console.error(err);
+
+    DOM.list.innerHTML =
+      `<div style="padding:15px;">
+        Failed to load downloads
+      </div>`;
+  }
 }
 
 function showAbout() {
@@ -1524,8 +1926,8 @@ function showAbout() {
   DOM.list.innerHTML = `
     <div style="padding:15px; line-height:1.6;">
       <h3>AlatiphA Music</h3>
-      <p>Offline-first music player using Service Worker caching.</p>
-      <p>Version: v5</p>
+      <p>With AlatiphA, it’s easy to listen to tailored online and offline music on your phone, your computer, your tablet and more.</p>
+      <p>Version: v6</p>
     </div>
   `;
 }
@@ -1710,6 +2112,34 @@ function getCurrentSong() {
   return STATE.songs[STATE.currentIndex] || null;
 }
 
+function isDownloaded(index) {
+
+  const song = STATE.songs[index];
+  if (!song) return false;
+
+  return !!STATE.downloadedSongs[song.src];
+}
+
+async function loadDownloadedSongsMap() {
+
+  try {
+
+    const downloads = await getAllDownloadedSongs();
+
+    STATE.downloadedSongs = {};
+
+    downloads.forEach(item => {
+      STATE.downloadedSongs[item.id] = item;
+    });
+
+  } catch (err) {
+
+    console.error("Failed loading download map", err);
+  }
+}
+
+
+
 // =======================
 // SWIPE GESTURES
 // =======================
@@ -1885,19 +2315,49 @@ DOM.audio.addEventListener("timeupdate", updateTime);
 //AUDIO
 DOM.audio.addEventListener("ended", function () {
 
+  // REPEAT ONE
+  if (STATE.repeat === "one") {
+
+    DOM.audio.currentTime = 0;
+    playSong();
+    return;
+  }
+
   const nextIndex = getNextIndex("next");
 
+  // END OF PLAYLIST
   if (nextIndex === null) {
-    pauseSong();
-    DOM.audio.currentTime = 0;
+
+    // repeat all fallback
+    if (STATE.repeat === "all") {
+
+      const playlist = getCurrentPlaylist();
+
+      if (playlist.length) {
+
+        STATE.currentIndex = playlist[0].index;
+
+        loadSong();
+        playSong();
+        highlightActiveTrack();
+        saveState();
+      }
+    }
+
+    else {
+
+      pauseSong();
+      DOM.audio.currentTime = 0;
+    }
+
     return;
   }
 
   STATE.currentIndex = nextIndex;
-  highlightActiveTrack();
 
   loadSong();
   playSong();
+  highlightActiveTrack();
   saveState();
 });
 
@@ -1947,10 +2407,18 @@ document.querySelectorAll(".tab-btn[data-playlist]").forEach(btn => {
 
   btn.onclick = function(){
 
+    // RETURN TO HOME VIEW
+    STATE.view = "home";
+
     STATE.showFavoritesOnly = false;
-    STATE.activePlaylist = this.dataset.playlist.toLowerCase();
+
+    STATE.activePlaylist =
+      this.dataset.playlist.toLowerCase();
 
     renderList(DOM.search.value);
+
+    highlightActiveTrack();
+
     updateActiveTab();
   };
 
@@ -1958,8 +2426,15 @@ document.querySelectorAll(".tab-btn[data-playlist]").forEach(btn => {
 
 //FAVORITES TAB 
 DOM.tabFavorites.onclick = ()=>{
+
+  STATE.view = "favorites";
+
   STATE.showFavoritesOnly = true;
+
   renderList(DOM.search.value);
+
+  highlightActiveTrack();
+
   updateActiveTab();
 };
 
@@ -1988,6 +2463,7 @@ DOM.shuffleBtn.onclick = () => {
   localStorage.setItem("shuffle", STATE.shuffle);
 
   updateShuffleButton();
+  
 };
 
 //REPEAT 
@@ -2058,27 +2534,72 @@ DOM.menuPopup.onclick = (e) => {
 };
 
 // Menu Download 
-DOM.menuDownload.onclick = () => {
+// MENU DOWNLOAD
+DOM.menuDownload.onclick = async () => {
 
-  const song = getCurrentSong();
-  if (!song) return;
+  try {
 
-  const link = document.createElement("a");
-  link.href = song.src;
-  link.download = song.title + ".mp3";
+    const song = getCurrentSong();
 
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+    if (!song) return;
 
-  const downloads = JSON.parse(localStorage.getItem("downloads")) || [];
+    DOM.menuDownload.innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> Downloading...';
 
-  if (!downloads.includes(STATE.currentIndex)) {
-    downloads.push(STATE.currentIndex);
-    localStorage.setItem("downloads", JSON.stringify(downloads));
+    // already downloaded?
+    const existing = await getSongFromDB(song.src);
+
+    if (existing) {
+
+      alert("Song already downloaded");
+
+      DOM.menuDownload.innerHTML =
+        '<i class="fas fa-download"></i> Download';
+
+      return;
+    }
+
+    // FETCH SONG
+    const response = await fetch(song.src);
+
+    if (!response.ok) {
+      throw new Error("Download failed");
+    }
+
+    // CONVERT TO BLOB
+    const blob = await response.blob();
+
+    // SAVE TO INDEXEDDB
+    await saveSongToDB({
+
+      id: song.src,
+      title: song.title,
+      blob: blob,
+      cover: song.cover || COVER,
+      downloadedAt: Date.now()
+    });
+
+await loadDownloadedSongsMap();
+
+alert("Song downloaded for offline use");
+
+if (STATE.view === "downloads") {
+  renderDownloads();
+}
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Download failed");
+
+  } finally {
+
+    DOM.menuDownload.innerHTML =
+      '<i class="fas fa-download"></i> Download';
+
+    DOM.menuPopup.style.display = "none";
   }
-
-  DOM.menuPopup.style.display = "none";
 };
 
 //Share
@@ -2116,7 +2637,10 @@ DOM.menuShare.onclick = async () => {
 // INIT
 // =======================
 
-function init(){
+async function init(){
+
+  await openDatabase();
+  await loadDownloadedSongsMap();
 
   renderList();
 
@@ -2129,7 +2653,11 @@ function init(){
   }, 50);
 
   updateActiveTab();
-  updateShuffleButton();
+  
+  STATE.shuffle =
+  JSON.parse(localStorage.getItem("shuffle")) || false;
+
+updateShuffleButton();
   updateRepeatButton();
   applyVolume();
   loadDurations();
