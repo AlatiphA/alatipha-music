@@ -1965,7 +1965,7 @@ function showAbout() {
     <div style="padding:15px; line-height:1.6;">
       <h3>AlatiphA Music</h3>
       <p>With AlatiphA, it’s easy to listen to tailored online and offline music on your phone, your computer, your tablet and more.</p>
-      <p>Version: v9</p>
+      <p>Version: v1 Beta 10</p>
     </div>
   `;
 }
@@ -2608,14 +2608,34 @@ DOM.menuDownload.onclick = async () => {
     }
 
     // FETCH SONG
-    const response = await fetch(song.src);
+const response = await fetch(song.src, {
+  mode: "cors",
+  cache: "no-cache"
+});
 
-    if (!response.ok) {
-      throw new Error("Download failed");
-    }
+if (!response.ok) {
+  throw new Error(
+    "Server blocked download or file unavailable"
+  );
+}
 
-    // CONVERT TO BLOB
-    const blob = await response.blob();
+// validate content
+const contentType =
+  response.headers.get("content-type") || "";
+
+if (
+  !contentType.includes("audio") &&
+  !contentType.includes("mpeg")
+) {
+  throw new Error("Invalid audio response");
+}
+
+// CONVERT TO BLOB
+const blob = await response.blob();
+
+if (!blob || blob.size === 0) {
+  throw new Error("Empty download");
+}
 
     // SAVE TO INDEXEDDB
     await saveSongToDB({
