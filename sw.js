@@ -1,7 +1,9 @@
-const CACHE_NAME = "alatipha-music-v8";
+const CACHE_NAME = "alatipha-music-v10";
 const SONG_CACHE = "alatipha-songs-v1";
 
-/* APP SHELL */
+/* ====================
+   APP SHELL
+==================== */
 const ASSETS = [
   "./",
   "./index.html",
@@ -11,27 +13,32 @@ const ASSETS = [
   "./css/all.min.css"
 ];
 
-/* INSTALL */
+/* ====================
+   INSTALL
+==================== */
 self.addEventListener("install", (event) => {
 
   self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(ASSETS))
   );
 });
 
-/* ACTIVATE */
+/* ====================
+   ACTIVATE
+==================== */
 self.addEventListener("activate", (event) => {
 
   event.waitUntil(
+
     (async () => {
 
       const keys = await caches.keys();
 
       await Promise.all(
+
         keys.map((key) => {
 
           if (
@@ -45,11 +52,12 @@ self.addEventListener("activate", (event) => {
 
       await self.clients.claim();
 
-      // Reload all tabs
+      // force reload all tabs
       const clientsList =
         await self.clients.matchAll();
 
       clientsList.forEach((client) => {
+
         client.postMessage({
           type: "RELOAD"
         });
@@ -59,12 +67,34 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-/* FETCH HANDLING */
+/* ====================
+   FETCH
+==================== */
 self.addEventListener("fetch", (event) => {
 
   const request = event.request;
 
-  /* 1. AUDIO STREAMS ONLY */
+  /* ====================
+     1. MANUAL DOWNLOADS
+     BYPASS SERVICE WORKER
+  ==================== */
+
+  if (
+    request.headers.get("x-download-request") === "true"
+  ) {
+
+    event.respondWith(
+      fetch(request)
+    );
+
+    return;
+  }
+
+  /* ====================
+     2. AUDIO STREAMS
+     CACHE FIRST
+  ==================== */
+
   if (
     request.destination === "audio" &&
     request.method === "GET"
@@ -77,37 +107,53 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  /* 2. FONTS */
+  /* ====================
+     3. FONTS
+     CACHE FIRST
+  ==================== */
+
   if (request.destination === "font") {
 
     event.respondWith(
 
-      caches.match(request).then((cached) => {
+      caches.match(request)
+        .then((cached) => {
 
-        return (
-          cached ||
+          if (cached) {
+            return cached;
+          }
 
-          fetch(request).then((response) => {
+          return fetch(request)
+            .then((response) => {
 
-            return caches.open(CACHE_NAME)
-              .then((cache) => {
+              if (
+                response &&
+                response.status === 200
+              ) {
 
-                cache.put(
-                  request,
-                  response.clone()
-                );
+                caches.open(CACHE_NAME)
+                  .then((cache) => {
 
-                return response;
-              });
-          })
-        );
-      })
+                    cache.put(
+                      request,
+                      response.clone()
+                    );
+                  });
+              }
+
+              return response;
+            });
+        })
     );
 
     return;
   }
 
-  /* 3. HTML NAVIGATION */
+  /* ====================
+     4. HTML NAVIGATION
+     NETWORK FIRST
+  ==================== */
+
   if (request.mode === "navigate") {
 
     event.respondWith(
@@ -118,19 +164,26 @@ self.addEventListener("fetch", (event) => {
 
       .then((response) => {
 
-        return caches.open(CACHE_NAME)
-          .then((cache) => {
+        if (
+          response &&
+          response.status === 200
+        ) {
 
-            cache.put(
-              request,
-              response.clone()
-            );
+          caches.open(CACHE_NAME)
+            .then((cache) => {
 
-            return response;
-          });
+              cache.put(
+                request,
+                response.clone()
+              );
+            });
+        }
+
+        return response;
       })
 
       .catch(() => {
+
         return caches.match("./index.html");
       })
     );
@@ -138,46 +191,62 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  /* 4. OTHER ASSETS */
+  /* ====================
+     5. OTHER ASSETS
+     CACHE FIRST
+  ==================== */
+
   event.respondWith(
 
-    caches.match(request).then((cached) => {
+    caches.match(request)
 
-      const fetchPromise = fetch(request)
+      .then((cached) => {
 
-        .then((networkResponse) => {
-
-          // cache only valid same-origin files
-          if (
-            networkResponse &&
-            networkResponse.status === 200 &&
-            networkResponse.type === "basic"
-          ) {
-
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-
-                cache.put(
-                  request,
-                  networkResponse.clone()
-                );
-              });
-          }
-
-          return networkResponse;
-        })
-
-        .catch(() => {
+        if (cached) {
           return cached;
-        });
+        }
 
-      return cached || fetchPromise;
-    })
+        return fetch(request)
+
+          .then((networkResponse) => {
+
+            if (
+              networkResponse &&
+              networkResponse.status === 200 &&
+              networkResponse.type === "basic"
+            ) {
+
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+
+                  cache.put(
+                    request,
+                    networkResponse.clone()
+                  );
+                });
+            }
+
+            return networkResponse;
+          })
+
+          .catch(() => {
+
+            return new Response(
+              "Offline",
+              {
+                status: 503,
+                statusText: "Service Unavailable"
+              }
+            );
+          });
+      })
   );
+});
 
-}); // IMPORTANT: closes fetch listener
+/* ====================
+   AUDIO CACHE STRATEGY
+==================== */
 
-/* AUDIO CACHE */
 async function cacheAudioFirst(request) {
 
   const cache =
@@ -195,7 +264,6 @@ async function cacheAudioFirst(request) {
     const response =
       await fetch(request);
 
-    // only cache successful audio
     if (
       response &&
       response.status === 200
@@ -214,13 +282,17 @@ async function cacheAudioFirst(request) {
     return new Response(
       "Audio not available offline",
       {
-        status: 404
+        status: 404,
+        statusText: "Not Found"
       }
     );
   }
 }
 
-/* MANUAL UPDATE CONTROL */
+/* ====================
+   MANUAL UPDATE CONTROL
+==================== */
+
 self.addEventListener("message", (event) => {
 
   if (
